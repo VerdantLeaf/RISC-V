@@ -20,13 +20,12 @@
 //////////////////////////////////////////////////////////////////////////////////
 
 
-module mux2
-    #(parameter DATA_WIDTH = 32)
-    (
+module mux2(
+   
     input sel,
-    input [DATA_WIDTH:0] a,
-    input [DATA_WIDTH:0] b,
-    output [DATA_WIDTH:0] out
+    input [31:0] a,
+    input [31:0] b,
+    output [31:0] out
     );
     
     always @(*)
