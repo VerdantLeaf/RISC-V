@@ -24,8 +24,8 @@ module regfile(
     input rst,
     input clk,
     // Read port 1
-    input reg [4:0] rSel1,
-    output reg [31:0] rs1Data,
+    input [4:0] rSel1,
+    output [31:0] rs1Data,
     // Read port 2
     input [4:0] rSel2,
     output [31:0] rs2Data,
