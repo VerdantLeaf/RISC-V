@@ -10,3 +10,4 @@ Ny first step is just completing the basic 5 stage pipeline for RISC-V and a sta
 ## Current status:
 
 Register file design has been completed and testbenched.
+4KB of instruction memory has been added. For simulation, programs can be ran/added by generating the .mem file and then modifying the program name in the imem.v file
