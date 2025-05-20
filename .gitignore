@@ -23,3 +23,5 @@ vivado/*/webtalk/
 # OS junk
 .DS_Store
 Thumbs.db
+
+RISC32I_Core/RISC32I_Core.gen
