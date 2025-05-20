@@ -1,5 +1,5 @@
 # RISC-V
-RISC-V implementations *(In Verilog, no idea why it says VHDL for the language)*
+RISC-V implementations **(In Verilog, no idea why it says VHDL for the language)**
 
 ## Goals
 
