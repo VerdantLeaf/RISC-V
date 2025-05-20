@@ -19,17 +19,17 @@
 // 
 //////////////////////////////////////////////////////////////////////////////////
 
-
-module mux2(
-   
+// Variable data width selection MUX
+module mux2
+    #(parameter DATAWIDTH = 32)(
     input sel,
-    input [31:0] a,
-    input [31:0] b,
-    output [31:0] out
+    input [DATAWIDTH - 1:0] a,
+    input [DATAWIDTH - 1:0] b,
+    output reg [DATAWIDTH - 1:0] out
     );
-    
+    // sel = 0 => a & sel = 1 => b 
     always @(*)
-        if(sel) out <= a;
-        else out <= b;
+        if(sel) out <= b;
+        else out <= a;
     
 endmodule
