@@ -10,4 +10,6 @@ Ny first step is just completing the basic 5 stage pipeline for RISC-V and a sta
 ## Current status:
 
 - Register file design has been completed and testbenched.
-- 4KB of instruction memory has been added and testbenched. For simulation, programs can be ran/added by generating the .mem file and then modifying the program name in the `imem.v` file
+- 4KB of instruction memory has been added and testbenched. For simulation, programs can be ran/added by generating the .mem file and then modifying the program name in the `imem.v` file. This only works in simulation however, will need to figure out another solution for implementation. BRAM IP block + .coe file didn't seem to be working.
+- IF/ID register is complete
+- IF stage is complete and TB is being worked on right now.
