@@ -34,7 +34,7 @@ module i_mem(
     wire [9:0] index = addr[11:2];
     
     initial begin
-        $readmemh("../../../../../programs/CountMemAddrs.mem", rom);    
+        $readmemh("../../../../../programs/program.mem", rom);    
     end
 
     

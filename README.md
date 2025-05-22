@@ -7,9 +7,13 @@ Due to the late change between grad school and a full time offer, I am not worki
 
 Ny first step is just completing the basic 5 stage pipeline for RISC-V and a standard In-Order CPU.
 
+## Loading programs for simulation
+
+For simulation, programs can be ran/added by generating the .mem file and then modifying the program name in the `imem.v` file. This only works in simulation however, will need to figure out another solution for implementation. BRAM IP block + .coe file didn't seem to be working.
+
 ## Current status:
 
 - Register file design has been completed and testbenched.
-- 4KB of instruction memory has been added and testbenched. For simulation, programs can be ran/added by generating the .mem file and then modifying the program name in the `imem.v` file. This only works in simulation however, will need to figure out another solution for implementation. BRAM IP block + .coe file didn't seem to be working.
+- 4KB of instruction memory has been added and testbenched. 
 - IF/ID register is complete
-- IF stage is complete and TB is being worked on right now.
+- IF stage is complete and testbenched.
