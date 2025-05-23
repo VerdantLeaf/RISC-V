@@ -9,7 +9,7 @@ Ny first step is just completing the basic 5 stage pipeline for RISC-V and a sta
 
 ## Loading programs for simulation
 
-For simulation, programs can be ran/added by generating the .mem file and then modifying the program name in the `imem.v` file. This only works in simulation however, will need to figure out another solution for implementation. BRAM IP block + .coe file didn't seem to be working.
+For simulation, programs can be ran/added by generating the .mem file and then modifying the program name in the `i_mem.v` file. For testing without caring about actual program instructions, program.mem contains instructions that just increment throughout the memory block. This solution only works in simulation however, will need to figure out another solution for implementation. BRAM IP block + .coe file didn't seem to be working.
 
 ## Current status:
 
