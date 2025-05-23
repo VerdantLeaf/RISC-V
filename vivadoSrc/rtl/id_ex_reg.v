@@ -24,34 +24,36 @@ module id_ex_reg(
     input clk,
     input rst,
     // Data
-    input [31:0] pc, // PC needed for branch/jump target
-    input [31:0] rd1, // register file data
-    input [31:0] rd2,
+    input [31:0] pc,            // PC needed for branch/jump target
+    input [31:0] rdata1,        // register file data
+    input [31:0] rdata2,
     input [31:0] immd,
-    input [4:0] rd,     // Destination register selection
+
+    // func 3?? other info? - This is a large register
 
     output reg [31:0] pc_out,
-    output reg [31:0] rd1_out,
-    output reg [31:0] rd2_out,
+    output reg [31:0] rdata1_out,
+    output reg [31:0] rdata2_out,
     output reg [31:0] immd_out,
-    output reg [4:0] rd_out,
 
     // Ctrl signals
-    input reg_write,
-    input read_mem,
-    input write_mem,
-    input alu_op,
-    input alu_src,
-    input mem_to_reg,
+    input [4:0] sel_dest_reg,   // Select register to write to
+    input en_write_reg,         // Enable writing to register
+    input en_mem_read,          // Enable mem read
+    input en_mem_write,         // Enable mem write
+    input sel_alu_op,           // Select alu operation
+    input sel_alu_src,          // Select alu source for second arg
+    input sel_write_src,        // Select write from data memory or ALU result
     input branch,
     input jump,    
 
-    output reg reg_write_out,
-    output reg read_mem_out,
-    output reg write_mem_out,
-    output reg alu_op_out,
-    output reg alu_src_out,
-    output reg mem_to_reg_out,
+    output reg [4:0] sel_dest_reg_out,
+    output reg en_write_reg_out,
+    output reg en_mem_read_out,
+    output reg en_mem_write_out,
+    output reg sel_alu_op_out,
+    output reg sel_alu_src_out,
+    output reg sel_write_src_out,
     output reg branch_out,
     output reg jump_out
 
@@ -60,32 +62,32 @@ module id_ex_reg(
     always @(posedge clk or posedge rst)
         if (rst) begin
             pc_out <= 32'b0;
-            rd1_out <= 32'b0;
-            rd2_out <= 32'b0;
+            rdata1_out <= 32'b0;
+            rdata2_out <= 32'b0;
             immd_out <= 32'b0;
-            rd_out <= 5'b0;
             
-            reg_write_out <= 0;
-            read_mem_out <= 0;
-            write_mem_out <= 0;
-            alu_op_out <= 0;
-            alu_src_out <= 0;
-            mem_to_reg_out <= 0;
+            sel_dest_reg_out <= 5'b0;
+            en_write_reg_out <= 0;
+            en_mem_read_out <= 0;
+            en_mem_write_out <= 0;
+            sel_alu_op_out <= 0;
+            sel_alu_src_out <= 0;
+            sel_write_src_out <= 0;
             branch_out <= 0;
             jump_out <= 0;
         end else begin
             pc_out <= pc;
-            rd1_out <= rd1;
-            rd2_out <= rd2;
+            rdata1_out <= rdata1;
+            rdata2_out <= rdata2;
             immd_out <= immd;
-            rd_out <= rd;
             
-            reg_write_out <= reg_write;
-            read_mem_out <= read_mem;
-            write_mem_out <= write_mem;
-            alu_op_out <= alu_op;
-            alu_src_out <= alu_src;
-            mem_to_reg_out <= mem_to_reg;
+            sel_dest_reg_out <= rd;
+            en_write_reg_out <= en_write_reg;
+            en_mem_read_out <= en_mem_read;
+            en_mem_write_out <= en_mem_write;
+            sel_alu_op_out <= sel_alu_op;
+            sel_alu_src_out <= sel_alu_src;
+            sel_write_src_out <= sel_write_src;
             branch_out <= branch;
             jump_out <= jump;
         end
