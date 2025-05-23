@@ -18,3 +18,23 @@
 // Additional Comments:
 // 
 //////////////////////////////////////////////////////////////////////////////////
+
+
+module ex_mem_reg(
+ 
+    input clk,
+    input rst,
+    // Data
+    input [31:0] branch_target,
+    input [31:0] rd2,
+    
+    // Ctrl signals
+    input is_zero,
+
+    input write_reg
+    
+    );
+    
+    
+
+endmodule

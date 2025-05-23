@@ -24,15 +24,17 @@ module id_ex_reg(
     input clk,
     input rst,
     // Data
-    input [31:0] rs1, // register file source
-    input [31:0] rs2,
-    input [31:0] immd,
     input [31:0] pc, // PC needed for branch/jump target
+    input [31:0] rd1, // register file data
+    input [31:0] rd2,
+    input [31:0] immd,
+    input [4:0] rd,     // Destination register selection
 
-    output reg [31:0] rs1_out,
-    output reg [31:0] rs2_out,
-    output reg [31:0] immd_out,
     output reg [31:0] pc_out,
+    output reg [31:0] rd1_out,
+    output reg [31:0] rd2_out,
+    output reg [31:0] immd_out,
+    output reg [4:0] rd_out,
 
     // Ctrl signals
     input reg_write,
@@ -57,10 +59,12 @@ module id_ex_reg(
 
     always @(posedge clk or posedge rst)
         if (rst) begin
-            rs1_out <= 32'b0;
-            rs2_out <= 32'b0;
-            immd_out <= 32'b0;
             pc_out <= 32'b0;
+            rd1_out <= 32'b0;
+            rd2_out <= 32'b0;
+            immd_out <= 32'b0;
+            rd_out <= 5'b0;
+            
             reg_write_out <= 0;
             read_mem_out <= 0;
             write_mem_out <= 0;
@@ -70,10 +74,12 @@ module id_ex_reg(
             branch_out <= 0;
             jump_out <= 0;
         end else begin
-            rs1_out <= rs1;
-            rs2_out <= rs2;
-            immd_out <= immd;
             pc_out <= pc;
+            rd1_out <= rd1;
+            rd2_out <= rd2;
+            immd_out <= immd;
+            rd_out <= rd;
+            
             reg_write_out <= reg_write;
             read_mem_out <= read_mem;
             write_mem_out <= write_mem;
