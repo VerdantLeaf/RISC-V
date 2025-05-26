@@ -23,7 +23,6 @@
 
 module d_mem(
     input clk,
-    
     // port A
     input               a_en_write,
     input               a_en_read,
@@ -32,7 +31,6 @@ module d_mem(
     input [1:0]         a_size,         // 00 = byye, 01 = half, 10 = word
     input               a_unsigned,     // 0 = signed, 1 = unsigned
     output reg [31:0]   a_dout,
-    
     
     // port B
     input               b_en_write,
@@ -45,39 +43,43 @@ module d_mem(
     
     );
     // 1024 word RAM (can always scale up)
-    reg [31:0] memory [0 : 1023];
-    
-    wire [9:2]          a_index     = a_addr[9:2]; // note: Change for parameterization
-    wire [1:0]          a_offset    = a_addr[1:0];
-    
-    wire [9:2]          b_index     = b_addr[9:2];
-    wire [1:0]          b_offset    = b_addr[1:0];
-
-    
-    
-    
-    
-    // future: Implement buffering on the memory system, and optimize read/write logic?
+    reg [31:0]      memory [0 : 1023];
+    // Index into memory + offset
+    wire [9:2]      a_index     = a_addr[9:2]; // note: Change for parameterization
+    wire [1:0]      a_offset    = a_addr[1:0];
+    // index into memory + ofset
+    wire [9:2]      b_index     = b_addr[9:2];
+    wire [1:0]      b_offset    = b_addr[1:0];
+    // extracted words from memory
+    reg [31:0]      a_mem_word, b_mem_word;
     
     // Load data memory with any data needed for the program, for simulation
     initial begin
         $readmemh("../../../../../programs/program_data.mem", memory);    
     end
     
-//    always @(posedge clk) begin
-//        if (en_read_mem ^ en_write_mem) begin   // if the two are different, then valid
-//            if (en_read_mem) begin
-                
-//            end else if (en_write_mem) begin
-                
-//            end
-//        end else if (en_read_mem && en_write_mem) begin // Using split bus, allow for concurrent reads and writes
-            
-//        end else begin // IF read and write enables are the same, then throw error  
-//            access_status <= 1;
-//            read_data <= 32'hFFFFFFFF;       
-//        end
-//    end
+    // -----------------
+    // PORT A READ/WRITE
+    // -----------------
+    always @(posedge clk) begin             // if a read or a write, grab the word at the index of the memory
+        if(a_en_write || a_en_read)         
+            a_mem_word = memory[a_index];   
+    end
     
+    always @(*) begin                       // The word is in a_mem_word.
+    
+    end
+    
+    // -----------------
+    // PORT B READ/WRITE
+    // -----------------
+    always @(posedge clk) begin             // if a read or a write, grab the word at the index of the memory
+        if(a_en_write || a_en_read)         
+            a_mem_word = memory[a_index];   
+    end
+    
+    always @(*) begin
+    
+    end
     
 endmodule
