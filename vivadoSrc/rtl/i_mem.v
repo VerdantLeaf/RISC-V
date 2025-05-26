@@ -19,6 +19,7 @@
 // 
 //////////////////////////////////////////////////////////////////////////////////
 
+// note: parameterize if you want to later
 
 module i_mem(
     input clk,
@@ -30,7 +31,7 @@ module i_mem(
     // and felt that it was distracting from what I want to do
     
     // 1024 word ROM
-    reg [31:0] rom [0 : 1023];
+    reg [31:0] rom [0 : 1023]; // note: change for parameterization
     wire [9:0] index = addr[11:2];
     
     initial begin
