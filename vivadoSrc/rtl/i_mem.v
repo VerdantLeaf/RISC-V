@@ -21,23 +21,23 @@
 
 // note: parameterize if you want to later
 
-module i_mem(
+module i_mem #(
+    parameter NUM_WORDS = 1024,     // 4KB mem
+    parameter WORD_SIZE = 32,
+    parameter ADDR_WIDTH = 10
+    )(
     input clk,
-    input [31:0] addr,
-    output reg [31:0] instr
+    input [ADDR_WIDTH - 1:0] addr,
+    output reg [WORD_SIZE - 1:0] instr
     );
     
-    // My orignal plan was to use a BRAM IP, but that got annoyingly complex,
-    // and felt that it was distracting from what I want to do
-    
-    // 1024 word ROM
-    reg [31:0] rom [0 : 1023]; // note: change for parameterization
-    wire [9:0] index = addr[11:2];
+
+    reg [WORD_SIZE - 1:0] rom [0 : NUM_WORDS - 1];
+    wire [ADDR_WIDTH - 1: $clog2(WORD_SIZE / 8)] index = addr[ADDR_WIDTH - 1 : $clog2(WORD_SIZE / 8)];
     
     initial begin
         $readmemh("../../../../../programs/program.mem", rom);    
     end
-
     
     always @(posedge clk) begin
         instr <= rom[index];

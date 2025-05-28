@@ -17,3 +17,5 @@ For simulation, programs can be ran/added by generating the .mem file and then m
 - 4KB of instruction memory has been added and testbenched. 
 - IF/ID register is complete
 - IF stage is complete and testbenched.
+- Data memory first complete draft completed. 1R1RW port setup
+- Parameterization of regfile, i/d_mem and if_stage complete

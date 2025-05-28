@@ -20,21 +20,25 @@
 //////////////////////////////////////////////////////////////////////////////////
 
 
-module if_stage(
+module if_stage #(
+    
+    WORD_SIZE = 32,
+    ADDR_SIZE = 10
 
+    )(
     input clk,
     input rst,
     // data 
-    input [31:0] pc_branch,
-    output [31:0] instr,
-    inout [31:0] pc_next,
+    input [ADDR_SIZE - 1 : 0] pc_branch,
+    output [WORD_SIZE - 1:0] instr,
+    inout [ADDR_SIZE - 1 : 0] pc_next,
     // ctrl signals
     input pcsrc,
     input en // Use for stall cycles on hazard resolution?
     );
 
-    wire [31:0] addr;
-    wire [31:0] pc_in;
+    wire [ADDR_SIZE - 1 : 0] addr;
+    wire [ADDR_SIZE - 1 : 0] pc_in;
 
     assign pc_in = (pcsrc) ? pc_branch : pc_next;
 

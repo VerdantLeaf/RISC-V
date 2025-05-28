@@ -20,22 +20,24 @@
 //////////////////////////////////////////////////////////////////////////////////
 
 
-module regfile(
+module regfile #(
+    parameter WORD_SIZE = 32
+    )(
     input rst,
     input clk,
     // Read port 1
-    input [4:0] rSel1,
-    output [31:0] rs1Data,
+    input [$clog2(WORD_SIZE) - 1:0] rSel1,
+    output [WORD_SIZE - 1:0] rs1Data,
     // Read port 2
-    input [4:0] rSel2,
-    output [31:0] rs2Data,
+    input [$clog2(WORD_SIZE) - 1:0] rSel2,
+    output [WORD_SIZE - 1:0] rs2Data,
     // Write port
     input wCtrl,
-    input [4:0] wSel,
-    input  wire [31:0] wData
+    input [$clog2(WORD_SIZE) - 1:0] wSel,
+    input  wire [WORD_SIZE - 1:0] wData
     );
     
-    wire [31:0] regOutput [0:31];
+    wire [31:0] regOutput [0:WORD_SIZE - 1];
     wire [31:0] wEnable;
 
     // Generate enable signals for registers
@@ -61,7 +63,7 @@ module regfile(
     endgenerate
 
     // Effectively a 32:1 MUX with 5 selection bits
-    assign rs1Data = (rSel1 == 5'd0) ? 32'b0 : regOutput[rSel1];
-    assign rs2Data = (rSel2 == 5'd0) ? 32'b0 : regOutput[rSel2];
+    assign rs1Data = (rSel1 == $clog2(WORD_SIZE)) ? {WORD_SIZE{1'b0}} : regOutput[rSel1];
+    assign rs2Data = (rSel2 == $clog2(WORD_SIZE)) ? {WORD_SIZE{1'b0}} : regOutput[rSel2];
     
 endmodule
