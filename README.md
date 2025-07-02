@@ -1,5 +1,6 @@
 # Status:
-I got very sick and I also have to travel, commits will be stalled till ~june 21st
+
+I am still somewhat sick, but it is not the kind of travel that prevents me from working on this. At least done with traveling, most likely, for the Summer.
 
 # RISC-V
 RISC-V implementation
