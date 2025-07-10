@@ -1,6 +1,6 @@
 # Status:
 
-I am still somewhat sick, but it is not the kind of travel that prevents me from working on this. At least done with traveling, most likely, for the Summer.
+I am back and working on the project, trying to complete and test as much as I can to get an interesting product
 
 # RISC-V
 RISC-V implementation
