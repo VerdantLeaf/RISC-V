@@ -30,17 +30,17 @@ module d_mem #(
 
     // Instruction port (Port A)
     input                               a_en_write,     // Don't use at first, rely on i_mem.v
-    input [ADDR_SIZE - 1 : 0]          a_addr,
-    output reg [WORD_SIZE - 1 : 0]     a_dout,
+    input [ADDR_SIZE - 1 : 0]           a_addr,
+    output reg [WORD_SIZE - 1 : 0]      a_dout,
     
     // Data port (Port B)
     input                               b_en_write,     // Keep names to change to true dual port one day
     input                               b_en_read,
-    input [WORD_SIZE - 1 : 0]          b_addr,
-    input [WORD_SIZE - 1 : 0]          b_din,
+    input [WORD_SIZE - 1 : 0]           b_addr,
+    input [WORD_SIZE - 1 : 0]           b_din,
     input [1:0]                         b_size,         // 00 = byte, 01 = half, 10 = word
     input                               b_unsigned,     // 0 = signed, 1 = unsigned
-    output reg [WORD_SIZE - 1 : 0]     b_dout
+    output reg [WORD_SIZE - 1 : 0]      b_dout
     
     );
     // Variable data size RAM - default to 4KB

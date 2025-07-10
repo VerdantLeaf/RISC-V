@@ -33,6 +33,7 @@ module ex_mem_reg(
     input en_write_reg,             // enable register writing in regfile
 
     input alu_zero,                 // is alu result zero
+    input alu_pos,                  // is alu result pos (if not pos and not zero, then neg)
     
     input branch,                   // is operation a branch operation
     input en_mem_read,              // enable mem read

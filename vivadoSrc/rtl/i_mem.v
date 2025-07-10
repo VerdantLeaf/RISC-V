@@ -24,16 +24,16 @@
 module i_mem #(
     parameter NUM_WORDS = 1024,     // 4KB mem
     parameter WORD_SIZE = 32,
-    parameter ADDR_WIDTH = 10
+    parameter ADDR_SIZE = 10
     )(
     input clk,
-    input [ADDR_WIDTH - 1:0] addr,
+    input [ADDR_SIZE - 1:0] addr,
     output reg [WORD_SIZE - 1:0] instr
     );
     
 
     reg [WORD_SIZE - 1:0] rom [0 : NUM_WORDS - 1];
-    wire [ADDR_WIDTH - 1: $clog2(WORD_SIZE / 8)] index = addr[ADDR_WIDTH - 1 : $clog2(WORD_SIZE / 8)];
+    wire [ADDR_SIZE - 1: $clog2(WORD_SIZE / 8)] index = addr[ADDR_SIZE - 1 : $clog2(WORD_SIZE / 8)];
     
     initial begin
         $readmemh("../../../../../programs/program.mem", rom);    

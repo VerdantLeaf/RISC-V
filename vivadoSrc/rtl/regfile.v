@@ -21,37 +21,40 @@
 
 
 module regfile #(
-    parameter WORD_SIZE = 32
+    
+    WORD_SIZE = 32,
+    NUM_REGS = 32
+    
     )(
     input rst,
     input clk,
     // Read port 1
-    input [$clog2(WORD_SIZE) - 1:0] rSel1,
+    input [$clog2(NUM_REGS) - 1:0] rs1,
     output [WORD_SIZE - 1:0] rs1Data,
     // Read port 2
-    input [$clog2(WORD_SIZE) - 1:0] rSel2,
+    input [$clog2(NUM_REGS) - 1:0] rs2,
     output [WORD_SIZE - 1:0] rs2Data,
     // Write port
     input wCtrl,
-    input [$clog2(WORD_SIZE) - 1:0] wSel,
+    input [$clog2(NUM_REGS) - 1:0] wSel,
     input  wire [WORD_SIZE - 1:0] wData
     );
     
-    wire [31:0] regOutput [0:WORD_SIZE - 1];
-    wire [31:0] wEnable;
+    wire [NUM_REGS - 1:0] regOutput [0:WORD_SIZE - 1];
+    wire [NUM_REGS - 1:0] wEnable;
 
     // Generate enable signals for registers
     genvar i;
     generate
         // wEnable[0] == 0 and wEnable[i] == 1 when write control and selection are valid for each i
-        for (i = 0; i < 32; i= i + 1) begin : gen_wEnable
+        for (i = 0; i < NUM_REGS; i= i + 1) begin : gen_wEnable
             assign wEnable[i] = (wCtrl && (wSel == i) && (i != 0));
         end
     endgenerate
     
-    // Generate 32 registers
+    // Generate NUM_REGS registers
     generate
-        for (i = 0; i < 32; i = i + 1) begin : gen_registers
+        for (i = 0; i < NUM_REGS; i = i + 1) begin : gen_registers
             register32 reg_i (
                 .clk(clk),
                 .rst(rst),
@@ -62,8 +65,14 @@ module regfile #(
         end
     endgenerate
 
-    // Effectively a 32:1 MUX with 5 selection bits
-    assign rs1Data = (rSel1 == $clog2(WORD_SIZE)) ? {WORD_SIZE{1'b0}} : regOutput[rSel1];
-    assign rs2Data = (rSel2 == $clog2(WORD_SIZE)) ? {WORD_SIZE{1'b0}} : regOutput[rSel2];
+    always @(posedge clk) begin
+        if(rst)
+            
+    
+    end
+
+    // If the selected reg is 0, then give zero, else give reg value
+    assign rs1Data = (rs1 == {$clog2(NUM_REGS){1'b0}}) ? {WORD_SIZE{1'b0}} : regOutput[rs1];
+    assign rs2Data = (rs2 == {$clog2(NUM_REGS){1'b0}}) ? {WORD_SIZE{1'b0}} : regOutput[rs2];
     
 endmodule
