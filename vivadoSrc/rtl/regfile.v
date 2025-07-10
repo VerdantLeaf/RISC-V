@@ -65,12 +65,6 @@ module regfile #(
         end
     endgenerate
 
-    always @(posedge clk) begin
-        if(rst)
-            
-    
-    end
-
     // If the selected reg is 0, then give zero, else give reg value
     assign rs1Data = (rs1 == {$clog2(NUM_REGS){1'b0}}) ? {WORD_SIZE{1'b0}} : regOutput[rs1];
     assign rs2Data = (rs2 == {$clog2(NUM_REGS){1'b0}}) ? {WORD_SIZE{1'b0}} : regOutput[rs2];

@@ -1,7 +1,8 @@
 # compile verilog/system verilog design source files
 verilog xil_defaultlib  \
-"../../../../../vivadoSrc/rtl/i_mem.v" \
-"../../../../../vivadoSrc/tb/i_mem_tb.v" \
+"../../../../../vivadoSrc/rtl/regfile.v" \
+"../../../../../vivadoSrc/utils/register32.v" \
+"../../../../../vivadoSrc/tb/regfile_tb.v" \
 
 # compile glbl module
 verilog xil_defaultlib "glbl.v"
