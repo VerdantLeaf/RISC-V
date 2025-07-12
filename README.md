@@ -1,6 +1,6 @@
 # Status:
 
-I think developing a non-pipelined CPU first would have been a good idea, but I have learned so much from this project, that I want to keep going. I didn't expect to get very sick or have the other issues this summer, but I am back. Would like to get to developing an interesting project.
+I think developing a non-pipelined CPU first would have been a good idea, but I have learned so much from this project, that I want to keep going. I didn't expect to get very sick or have the other issues this summer, but I am back. I am focused on making this an interesting project, more than anything. I never thought this would be easy and I have learned a ton, so it's been a success in that metric, but I would really like to have something concrete to show for it.
 
 # RISC-V
 RISC-V implementation. Design and implementation of a 5-stage pipelines RV32I RISC-V processor in Verilog with a Harvard memory architecture. 
