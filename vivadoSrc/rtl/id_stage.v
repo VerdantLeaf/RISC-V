@@ -29,14 +29,6 @@
 `define OPCODE_U_AUIPC 5'b00101
 `define OPCODE_JALR 5'b11001
 
-`define R_TYPE 3'd0
-`define I_TYPE 3'd1
-`define S_TYPE 3'd2
-`define B_TYPE 3'd3
-`define U_TYPE 3'd4
-`define J_TYPE 3'd5
-`define NOP_TYPE 3'd7
-
 module id_stage #(
 
     WORD_SIZE = 32,
@@ -50,10 +42,11 @@ module id_stage #(
     input rst,
     input [WORD_SIZE - 1 : 0] instr,    // Instruction to be decoded
     
-    output [WORD_SIZE - 1 : 0] immd, 
-    output alu_op,                      // Tells the ALU which operation to do
-    output reg_write,                   // Says if instruction writes to register
-    output mem_read                     // Says if instruction reads from memory
+    output reg [WORD_SIZE - 1 : 0] immd,    // 
+    output reg [2:0]alu_op,                 // Tells the ALU which operation to do
+    output reg reg_write,                   // Says if instruction writes to register
+    output reg mem_read,                    // Says if instruction reads from memory
+    output use_immd                     // Says if the instruction uses the immediate
 
     );
 
@@ -62,6 +55,9 @@ module id_stage #(
     wire opcode;
     reg [2:0] instr_type;
 
+    // Not sure why defines would not work for this tbh
+    localparam R_TYPE = 3'd0, I_TYPE = 3'd1, S_TYPE = 3'd2, B_TYPE = 3'd3;
+    localparam U_TYPE = 3'd4, J_TYPE = 3'd5, NOP_TYPE = 3'd7;
 
     regfile registerfile(
         .clk(clk),
@@ -80,9 +76,8 @@ module id_stage #(
     always @(*) begin
         
         // Decode the opcode to select the correct if statement
-        opcode <= instr[6:2];  // instr[1:0] is same forall instructions
 
-        case(opcode)
+        case(instr[6:2])
             `OPCODE_R: begin // R=type
                 instr_type = R_TYPE;
             end
@@ -102,9 +97,12 @@ module id_stage #(
                 instr_type = J_TYPE;
             end
             default: begin
-                instr_type = NOP_TYPE;        
+                instr_type = NOP_TYPE;      
+                alu_op =  3'd5; // NOP encoded as ADDI x0, x0, 0
+                
             end
         endcase
-
     end
+
+    assign use_immd = (instr_type == (I_TYPE || NOP_TYPE) ? 1'b1 : 1'b0);
 endmodule
