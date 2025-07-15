@@ -23,20 +23,21 @@
 module regfile #(
     
     WORD_SIZE = 32,
-    NUM_REGS = 32
+    NUM_REGS = 32,
+    REG_SEL = $clog2(NUM_REGS)
     
     )(
     input rst,
     input clk,
     // Read port 1
-    input [$clog2(NUM_REGS) - 1:0] rs1,
+    input [REG_SEL - 1:0] rs1,
     output [WORD_SIZE - 1:0] rs1Data,
     // Read port 2
-    input [$clog2(NUM_REGS) - 1:0] rs2,
+    input [REG_SEL - 1 - 1:0] rs2,
     output [WORD_SIZE - 1:0] rs2Data,
     // Write port
     input wCtrl,
-    input [$clog2(NUM_REGS) - 1:0] wSel,
+    input [REG_SEL - 1 - 1:0] wSel,
     input  wire [WORD_SIZE - 1:0] wData
     );
     
