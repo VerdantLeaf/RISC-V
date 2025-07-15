@@ -80,40 +80,55 @@ module id_stage #(
         
         // Decode the opcode to select the correct if statement
 
-        opcode <= instr[6:2];
-        destination <= {REG_SEL{1'b0}};
-        rs1 <= {REG_SEL{1'b0}};
-        rs2 <= {REG_SEL{1'b0}};
+        opcode = instr[6:2];
+        destination = {REG_SEL{1'b0}};
+        rs1 = {REG_SEL{1'b0}};
+        rs2 = {REG_SEL{1'b0}};
 
         case(opcode)
-            `OPCODE_R: begin // R=type
-                instr_type <= `R_TYPE;
+            `OPCODE_R: begin // R-type
+                instr_type = `R_TYPE;
 
-                destination <= instr[11:7]; // This you would have to change manually?
-                rs1 <= instr[19:15];
-                rs2 <= instr[24:20];
+                destination = instr[11:7]; // This you would have to change manually?
+                rs1 = instr[19:15];
+                rs2 = instr[24:20];
 
-                alu_op <= {instr[30], instr[14:12]}; // ALU operations are just func7[5] + func3
+                alu_op = {instr[30], instr[14:12]}; // ALU operations are just func7[5] + func3
 
             end
-            `OPCODE_I, `OPCODE_L, `OPCODE_JALR: begin // I-type
+            `OPCODE_I, `OPCODE_L, `OPCODE_JALR: begin // I-type - immediate handled by generator
                 instr_type = `I_TYPE;
+
+                destination = instr[11:7];
+                rs1 = instr[19:15];
+                alu_op = {instr[30], instr[14:12]};
 
             end
             `OPCODE_S: begin // S-type
                 instr_type = `S_TYPE;
+
+                alu_op = {1'b0, instr[14:12]};
+                rs1 = instr[19:15];
+                rs2 = instr[24:20];
+
             end
             `OPCODE_B: begin // B-type
                 instr_type = `B_TYPE;
 
+                alu_op = {1'b0, instr[14:12]};
+                rs1 = instr[19:15];
+                rs2 = instr[24:20];
+
             end
             `OPCODE_U_LUI, `OPCODE_U_AUIPC: begin // LUI, AUIPC
                 instr_type = `U_TYPE;
-
+                // immd habdled by generator and passed to output
                 destination <= instr[11:7];
             end
             `OPCODE_JAL: begin // JAL
                 instr_type = `J_TYPE;
+                // immd handled by generator and passed to output
+                destination = instr[11:7];
             end
             default: begin
                 instr_type = `NOP_TYPE;      

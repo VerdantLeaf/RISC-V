@@ -1,7 +1,7 @@
 `timescale 1ns / 1ps
 //////////////////////////////////////////////////////////////////////////////////
-// Company: 
-// Engineer: 
+// Company: myself
+// Engineer: kyle
 // 
 // Create Date: 05/22/2025 10:28:31 AM
 // Design Name: 
