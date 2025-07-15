@@ -19,15 +19,7 @@
 // 
 //////////////////////////////////////////////////////////////////////////////////
 
-`define OPCODE_R   5'b01100
-`define OPCODE_I   5'b00100
-`define OPCODE_L   5'b00000
-`define OPCODE_JAL 5'b11011
-`define OPCODE_B   5'b11000
-`define OPCODE_S   5'b01000
-`define OPCODE_U_LUI  5'b01101
-`define OPCODE_U_AUIPC 5'b00101
-`define OPCODE_JALR 5'b11001
+`include "../utils/defines.vh"
 
 module id_stage #(
 
@@ -49,31 +41,32 @@ module id_stage #(
     output reg [WORD_SIZE - 1 : 0] immd,        // Immediate extracted from immediate decode
     output reg [WORD_SIZE - 1 : 0] data1,       // First data from the register file
     output reg [WORD_SIZE - 1 : 0] data2,       // Second data from register file (src_immd determines valid)
-    output reg [3:0]alu_op,                     // Tells the ALU which operation to do 
+    output reg [3:0] alu_op,                    // Tells the ALU which operation to do 
     output reg [REG_SEL - 1 : 0] destination,   // The destination register for the instruction
-    output write_reg,                    // Says if instruction writes to a register
+
+    output write_reg,                           // Says if instruction writes to a register
     output mem_write,                           // Says if instruction writes to memory
     output mem_read,                            // Says if instruction reads from memory
-    output src_immd                             // 1 => Use immd, 0 => Use data 2 (Selector for mux)
+    output src_immd,                            // 1 => Use immd, 0 => Use data 2 (Selector for mux)
+    output branch                               // Says if instruction branches            
 
     );
 
     reg [REG_SEL - 1 : 0] rs1, rs2;
-    wire [WORD_SIZE - 1 : 0] rs1Data, rs2Data;
     reg opcode;
     reg [2:0] instr_type;
 
-    // Not sure why defines would not work for this tbh
-    localparam R_TYPE = 3'd0, I_TYPE = 3'd1, S_TYPE = 3'd2, B_TYPE = 3'd3;
-    localparam U_TYPE = 3'd4, J_TYPE = 3'd5, NOP_TYPE = 3'd7;
+    wire [WORD_SIZE - 1 :0] immediate;
 
     regfile registerfile(
         .clk(clk),
         .rst(rst),
+        
         .rs1(rs1),
-        .rs1Data(rs1Data),
+        .rs1Data(data1),
         .rs2(rs2),
-        .rs2Data(rs2Data),
+        .rs2Data(data2),
+
         .wCtrl(reg_write),
         .wSel(rd_select),
         .wData(rd_data)
@@ -86,12 +79,15 @@ module id_stage #(
         // Decode the opcode to select the correct if statement
 
         opcode <= instr[6:2];
+        destination <= {REG_SEL{1'b0}};
+        rs1 <= {REG_SEL{1'b0}};
+        rs2 <= {REG_SEL{1'b0}};
 
         case(opcode)
             `OPCODE_R: begin // R=type
                 instr_type <= R_TYPE;
 
-                destination <= instr[11:7];
+                destination <= instr[11:7]; // This you would have to change manually?
                 rs1 <= instr[19:15];
                 rs2 <= instr[24:20];
 
@@ -112,6 +108,9 @@ module id_stage #(
             `OPCODE_U_LUI, `OPCODE_U_AUIPC: begin // LUI, AUIPC
                 instr_type = U_TYPE;
 
+                destination <= instr[11:7];
+                immediate[WORD_SIZE - 1 : WORD_SIZE - 20] = instr[31 : 12]; // does this make sense?
+
             end
             `OPCODE_JAL: begin // JAL
                 instr_type = J_TYPE;
@@ -125,9 +124,12 @@ module id_stage #(
 
     assign mem_read = (instr_type == (I_TYPE && `OPCODE_L)) ? 1'b1 : 1'b0;
     assign mem_write = (instr_type == S_TYPE) ? 1'b1 : 1'b0;
-    assign reg_write = (destination != 5'd0) ? 1'b1 : 1'b0;
+    // x0 can't be written to, so we'll default to 0, and change if we are writing to
+    // Even if you are trying to intentionally or unintnetionally write to x0, it will fail
+    assign reg_write = (destination != 5'd0) ? 1'b1 : 1'b0; 
     
     assign src_immd = (instr_type == (I_TYPE || NOP_TYPE)) ? 1'b1 : 1'b0;
+    assign branch = (instr_type == B_TYPE) ? 1'b1 : 1'b0;
     
 
 endmodule

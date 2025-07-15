@@ -20,7 +20,18 @@
 //////////////////////////////////////////////////////////////////////////////////
 
 
-module immd_gen(
+module immd_gen #(
+
+    WORD_SIZE = 32
+
+    )(
+
+    input clk,
+    input rst,
+
+    input [WORD_SIZE - 1 : 0] immd,
+
+    output [WORD_SIZE - 1 : 0] generated_immd
 
     );
 endmodule
