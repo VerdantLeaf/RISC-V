@@ -41,12 +41,16 @@ module id_stage #(
     input clk, 
     input rst,
     input [WORD_SIZE - 1 : 0] instr,    // Instruction to be decoded
+    input en_write_reg,                     // Should
     
-    output reg [WORD_SIZE - 1 : 0] immd,    // 
+
+    output reg [WORD_SIZE - 1 : 0] immd,    // Immediate extracted from immediate decode
+    output reg [WORD_SIZE - 1 : 0]
     output reg [2:0]alu_op,                 // Tells the ALU which operation to do
-    output reg reg_write,                   // Says if instruction writes to register
+    output reg en_write_reg,                // Says if instruction writes to a register
+    output reg mem_write,                   // Says if instruction writes to memory
     output reg mem_read,                    // Says if instruction reads from memory
-    output use_immd                     // Says if the instruction uses the immediate
+    output use_immd                         // Says if the instruction uses the immediate
 
     );
 
@@ -77,32 +81,56 @@ module id_stage #(
         
         // Decode the opcode to select the correct if statement
 
-        case(instr[6:2])
+        opcode = instr[6:2];
+
+        case(opcode)
             `OPCODE_R: begin // R=type
                 instr_type = R_TYPE;
+                mem_read = 0;
+                mem_write = 0;
+
+                rs1 = instr[19:15];
+                rs2 = instr[24:20];
+
             end
             `OPCODE_I, `OPCODE_L, `OPCODE_JALR: begin // I-type
                 instr_type = I_TYPE;
+                mem_write = 0;
+
+                if(opcode == `OPCODE_L) mem_read = 1;
+                else mem_read = 0;
+
             end
             `OPCODE_S: begin // S-type
                 instr_type = S_TYPE;
+                mem_read = 0;
+                mem_write = 1;
             end
             `OPCODE_B: begin // B-type
                 instr_type = B_TYPE;
+                mem_read = 0;
+                mem_write = 0;
+
             end
             `OPCODE_U_LUI, `OPCODE_U_AUIPC: begin // LUI, AUIPC
                 instr_type = U_TYPE;
+                mem_read = 0;
+                mem_write = 0;
+
             end
             `OPCODE_JAL: begin // JAL
                 instr_type = J_TYPE;
+                mem_read = 0;
+                mem_write = 0;
             end
             default: begin
                 instr_type = NOP_TYPE;      
                 alu_op =  3'd5; // NOP encoded as ADDI x0, x0, 0
-                
+                mem_read = 0;
+                mem_write = 0;
             end
         endcase
     end
 
-    assign use_immd = (instr_type == (I_TYPE || NOP_TYPE) ? 1'b1 : 1'b0);
+    assign use_immd = (instr_type == (I_TYPE || NOP_TYPE)) ? 1'b1 : 1'b0;
 endmodule
