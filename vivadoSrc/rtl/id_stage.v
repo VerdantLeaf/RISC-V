@@ -53,7 +53,7 @@ module id_stage #(
     );
 
     reg [REG_SEL - 1 : 0] rs1, rs2;
-    reg opcode;
+    reg [4:0] opcode;
     reg [2:0] instr_type;
 
     regfile registerfile(
@@ -93,6 +93,17 @@ module id_stage #(
                 rs1 = instr[19:15];
                 rs2 = instr[24:20];
 
+                case(instr[14:12])
+                    3'b000: alu_op = (instr[30]) ? `ALU_OP_SUB : `ALU_OP_ADD;
+                    3'b001: alu_op = `ALU_OP_SLL;
+                    3'b010: alu_op = `ALU_OP_SLT;
+                    3'b011: alu_op = `ALU_OP_SLTU;
+                    3'b100: alu_op = `ALU_OP_XOR;
+                    3'b101: alu_op = (instr[30]) ? `ALU_OP_SRA : `ALU_OP_SRL;
+                    3'b110: alu_op = `ALU_OP_OR;
+                    3'b111: alu_op = `ALU_OP_AND;
+                endcase
+
                 alu_op = {instr[30], instr[14:12]}; // ALU operations are just func7[5] + func3
 
             end
@@ -131,7 +142,8 @@ module id_stage #(
                 destination = instr[11:7];
             end
             default: begin
-                instr_type = `NOP_TYPE;      
+                instr_type = `NOP_TYPE;  
+                alu_op = `ALU_OP_ADD;    
                 // NOP encoded as ADDI x0, x0, 0
             end
         endcase
