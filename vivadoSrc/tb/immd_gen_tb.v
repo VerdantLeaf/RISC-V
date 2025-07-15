@@ -45,9 +45,9 @@ module immd_gen_tb #(
         
         instr_type = `I_TYPE; instr = 32'h0223_8693; #10;
         instr_type = `S_TYPE; instr = 32'h5862_2c23; #10;
-        instr_type = `B_TYPE; instr = 32'h35bb_8ee3; #10;
-        instr_type = `U_TYPE; instr = 32'h07c9_fbb7; #10;
-        instr_type = `J_TYPE; instr = 32'h29e4_f36f; #10;
+        instr_type = `B_TYPE; instr = 32'h45bb_8663; #10;
+        instr_type = `U_TYPE; instr = 32'h4fab_f637; #10;
+        instr_type = `J_TYPE; instr = 32'h1b81_ec6f; #10;
         instr_type = `R_TYPE; instr = 32'hDEAD_BEEF; #10;
 
         $finish;
