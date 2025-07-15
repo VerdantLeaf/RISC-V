@@ -19,7 +19,7 @@
 // 
 //////////////////////////////////////////////////////////////////////////////////
 
-`include "../utils/defines.vh"
+`include "defines.vh"
 
 module id_stage #(
 
@@ -56,8 +56,6 @@ module id_stage #(
     reg opcode;
     reg [2:0] instr_type;
 
-    wire [WORD_SIZE - 1 :0] immediate;
-
     regfile registerfile(
         .clk(clk),
         .rst(rst),
@@ -72,7 +70,11 @@ module id_stage #(
         .wData(rd_data)
     );
 
-    immd_gen immediategenerator();
+    immd_gen immediategenerator(
+        .instr(instr),
+        .instr_type(instr_type),
+        .immd_out(immd)
+    );
     
     always @(*) begin
         
@@ -85,7 +87,7 @@ module id_stage #(
 
         case(opcode)
             `OPCODE_R: begin // R=type
-                instr_type <= R_TYPE;
+                instr_type <= `R_TYPE;
 
                 destination <= instr[11:7]; // This you would have to change manually?
                 rs1 <= instr[19:15];
@@ -95,41 +97,39 @@ module id_stage #(
 
             end
             `OPCODE_I, `OPCODE_L, `OPCODE_JALR: begin // I-type
-                instr_type = I_TYPE;
+                instr_type = `I_TYPE;
 
             end
             `OPCODE_S: begin // S-type
-                instr_type = S_TYPE;
+                instr_type = `S_TYPE;
             end
             `OPCODE_B: begin // B-type
-                instr_type = B_TYPE;
+                instr_type = `B_TYPE;
 
             end
             `OPCODE_U_LUI, `OPCODE_U_AUIPC: begin // LUI, AUIPC
-                instr_type = U_TYPE;
+                instr_type = `U_TYPE;
 
                 destination <= instr[11:7];
-                immediate[WORD_SIZE - 1 : WORD_SIZE - 20] = instr[31 : 12]; // does this make sense?
-
             end
             `OPCODE_JAL: begin // JAL
-                instr_type = J_TYPE;
+                instr_type = `J_TYPE;
             end
             default: begin
-                instr_type = NOP_TYPE;      
+                instr_type = `NOP_TYPE;      
                 // NOP encoded as ADDI x0, x0, 0
             end
         endcase
     end
 
-    assign mem_read = (instr_type == (I_TYPE && `OPCODE_L)) ? 1'b1 : 1'b0;
-    assign mem_write = (instr_type == S_TYPE) ? 1'b1 : 1'b0;
+    assign mem_read = (instr_type == (`I_TYPE && `OPCODE_L)) ? 1'b1 : 1'b0;
+    assign mem_write = (instr_type == `S_TYPE) ? 1'b1 : 1'b0;
     // x0 can't be written to, so we'll default to 0, and change if we are writing to
     // Even if you are trying to intentionally or unintnetionally write to x0, it will fail
     assign reg_write = (destination != 5'd0) ? 1'b1 : 1'b0; 
     
-    assign src_immd = (instr_type == (I_TYPE || NOP_TYPE)) ? 1'b1 : 1'b0;
-    assign branch = (instr_type == B_TYPE) ? 1'b1 : 1'b0;
+    assign src_immd = (instr_type == (`I_TYPE || `NOP_TYPE)) ? 1'b1 : 1'b0;
+    assign branch = (instr_type == `B_TYPE) ? 1'b1 : 1'b0;
     
 
 endmodule

@@ -42,22 +42,22 @@ module alu #(
     // localparam op_and = 3'd0, op_or = 3'd1, op_xor = 3'd2, op_shift_L = 3'd3;
     // localparam op_shift_R = 3'd4, op_add = 3'd5, op_sub = 3'd6;
 
-    always @(posedge clk) begin
+    // always @(posedge clk) begin
         
-        if(rst)
+    //     if(rst)
 
-        else
-            case(alu_op)
-                op_and:
-                op_or:
-                op_xor:
-                op_shift_L:
-                op_shift_R:
-                op_add:
-                op_sub:
-            endcase
+    //     else
+    //         case(alu_op)
+    //             op_and:
+    //             op_or:
+    //             op_xor:
+    //             op_shift_L:
+    //             op_shift_R:
+    //             op_add:
+    //             op_sub:
+    //         endcase
         
-    end
+    // end
 
 
 
