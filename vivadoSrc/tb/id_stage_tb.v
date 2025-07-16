@@ -41,7 +41,7 @@ module id_stage_tb #(
     wire [WORD_SIZE - 1:0] data1;
     wire [WORD_SIZE - 1:0] data2;
     wire [3:0] alu_op;
-    wire [REG_SEL - 1:0] destination;
+    wire [REG_SEL - 1:0] rd;
 
     wire mem_read;   
     wire mem_write;   
@@ -65,7 +65,7 @@ module id_stage_tb #(
         .data1(data1),
         .data2(data2),
         .alu_op(alu_op),
-        .destination(destination),
+        .rd(rd),
         // control signals
         .mem_read(mem_read),
         .mem_write(mem_write),
@@ -118,7 +118,7 @@ module id_stage_tb #(
 
         @(posedge clk);
         rst = 0;
-
+        @(posedge clk);
         // ----------------------- LOAD REGISTERS ----------------------
         // x29 := 69632
         reg_write = 1;          
@@ -151,6 +151,8 @@ module id_stage_tb #(
         instr = 32'h00c00713;   
         @(posedge clk);
         #1;
+        $display("Instr=%h | opcode=%b | instr_type=%d | rs1=%d | rs2=%d | rd=%d", 
+         instr, dut.opcode, dut.instr_type, dut.rs1, dut.rs2, dut.rd);
         check_outputs(
             `__LINE__,
             32'd0,              // data1 (x0)
@@ -165,6 +167,8 @@ module id_stage_tb #(
         instr = 32'h00ee8c33;   
         @(posedge clk);
         #1;
+        $display("Instr=%h | opcode=%b | instr_type=%d | rs1=%d | rs2=%d | rd=%d", 
+         instr, dut.opcode, dut.instr_type, dut.rs1, dut.rs2, dut.rd);
         check_outputs(
             `__LINE__,
             32'd69632,          // data1 (x29)
@@ -179,6 +183,8 @@ module id_stage_tb #(
         instr = 32'h200c2803;
         @(posedge clk);     
         #1;
+        $display("Instr=%h | opcode=%b | instr_type=%d | rs1=%d | rs2=%d | rd=%d", 
+         instr, dut.opcode, dut.instr_type, dut.rs1, dut.rs2, dut.rd);
         check_outputs(
             `__LINE__,
             32'd69644,          // data1 (x24)
@@ -193,6 +199,8 @@ module id_stage_tb #(
         instr = 32'hed071e23; 
         @(posedge clk);         
         #1;
+        $display("Instr=%h | opcode=%b | instr_type=%d | rs1=%d | rs2=%d | rd=%d", 
+         instr, dut.opcode, dut.instr_type, dut.rs1, dut.rs2, dut.rd);
         check_outputs(
             `__LINE__,
             32'd12,             // data1 (x14)
@@ -207,6 +215,8 @@ module id_stage_tb #(
         instr = 32'h12fc5863;   
         @(posedge clk);         
         #1;
+        $display("Instr=%h | opcode=%b | instr_type=%d | rs1=%d | rs2=%d | rd=%d", 
+         instr, dut.opcode, dut.instr_type, dut.rs1, dut.rs2, dut.rd);
         check_outputs(
             `__LINE__,
             32'd69644,          // data1 (x24)
@@ -221,6 +231,8 @@ module id_stage_tb #(
         instr = 32'h701010ef;
         @(posedge clk);         
         #1;
+        $display("Instr=%h | opcode=%b | instr_type=%d | rs1=%d | rs2=%d | rd=%d", 
+         instr, dut.opcode, dut.instr_type, dut.rs1, dut.rs2, dut.rd);
         check_outputs(
             `__LINE__,
             32'd0,              // data1 (x0)
@@ -235,6 +247,8 @@ module id_stage_tb #(
         instr = 32'h04321ab7;    
         @(posedge clk);
         #1;
+        $display("Instr=%h | opcode=%b | instr_type=%d | rs1=%d | rs2=%d | dest=%d", 
+         instr, dut.opcode, dut.instr_type, dut.rs1, dut.rs2, dut.rd);
         check_outputs(
             `__LINE__,
             32'd0,              // data1 (x0)

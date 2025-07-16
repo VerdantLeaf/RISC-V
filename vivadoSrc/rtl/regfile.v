@@ -24,7 +24,7 @@ module regfile #(
     
     WORD_SIZE = 32,
     NUM_REGS = 32,
-    REG_SEL = $clog2(NUM_REGS)
+    REG_SEL = 5
     
     )(
     input rst,
@@ -67,7 +67,7 @@ module regfile #(
     endgenerate
 
     // If the selected reg is 0, then give zero, else give reg value
-    assign rs1Data = (rs1 == {$clog2(NUM_REGS){1'b0}}) ? {WORD_SIZE{1'b0}} : regOutput[rs1];
-    assign rs2Data = (rs2 == {$clog2(NUM_REGS){1'b0}}) ? {WORD_SIZE{1'b0}} : regOutput[rs2];
+    assign rs1Data = (rs1 == {REG_SEL{1'b0}}) ? {WORD_SIZE{1'b0}} : regOutput[rs1];
+    assign rs2Data = (rs2 == {REG_SEL{1'b0}}) ? {WORD_SIZE{1'b0}} : regOutput[rs2];
     
 endmodule

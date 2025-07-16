@@ -25,7 +25,7 @@ module id_stage #(
 
     WORD_SIZE = 32,
     NUM_REGS = 32,
-    REG_SEL = $clog2(NUM_REGS),
+    REG_SEL = 5,
     ADDR_SIZE = 10
 
     )(
@@ -41,7 +41,7 @@ module id_stage #(
     output [WORD_SIZE - 1 : 0] data1,           // First data from the register file
     output [WORD_SIZE - 1 : 0] data2,           // Second data from register file (alu_src determines valid)
     output reg [3:0] alu_op,                    // Tells the ALU which operation to do 
-    output reg [REG_SEL - 1 : 0] destination,   // The destination register for the instruction
+    output [REG_SEL - 1 : 0] rd,       // The rd register for the instruction
 
     output mem_read,                            // Instruction reads from memory
     output mem_write,                           // Instruction writes to memory
@@ -53,9 +53,10 @@ module id_stage #(
     
     );
 
-    reg [REG_SEL - 1 : 0] rs1, rs2;
-    reg [4:0] opcode;
-    reg [2:0] func3;
+    wire [REG_SEL - 1 : 0] rs1;
+    wire [REG_SEL - 1 :0] rs2;
+    wire [4:0] opcode;
+    wire [2:0] func3;
     reg [2:0] instr_type;
 
     regfile registerfile(
@@ -78,15 +79,19 @@ module id_stage #(
         .immd_out(immd)
     );
     
+    assign opcode   = instr[6:2];
+    assign func3    = instr[14:12];
+    assign rs1      = instr[19:15];
+    assign rs2      = instr[24:20];
+    assign rd       = instr[11:7];
+    
     always @(*) begin
         
         // Decode the opcode to select the correct if statement
 
-        opcode      = instr[6:2];
-        func3       = instr[14:12]; // Ignore for J and U types
-        destination = {REG_SEL{1'b0}};
-        rs1         = {REG_SEL{1'b0}};
-        rs2         = {REG_SEL{1'b0}};
+        // rd = {REG_SEL{1'b0}};
+        // rs1         = {REG_SEL{1'b0}};
+        // rs2         = {REG_SEL{1'b0}};
         alu_op      = `ALU_OP_ADD;
         instr_type  = `NOP_TYPE;
 
@@ -94,9 +99,9 @@ module id_stage #(
             // ------------------------------ R-TYPE -----------------------------
             `OPCODE_R: begin // R-type
                 instr_type  = `R_TYPE;
-                destination = instr[11:7]; // This you would have to change manually?
-                rs1         = instr[19:15];
-                rs2         = instr[24:20];
+                // rd = instr[11:7]; 
+                // rs1         = instr[19:15];
+                // rs2         = instr[24:20];
 
                 case (func3)
                     3'b000: alu_op = (instr[30]) ? `ALU_OP_SUB : `ALU_OP_ADD;
@@ -112,8 +117,8 @@ module id_stage #(
             // ----------------------------- I-TYPE ------------------------------
             `OPCODE_I, `OPCODE_JALR: begin
                 instr_type  = `I_TYPE;
-                destination = instr[11:7];
-                rs1         = instr[19:15];
+                // rd = instr[11:7];
+                // rs1         = instr[19:15];
 
                 case (func3)
                     3'b000: alu_op = `ALU_OP_ADD; // ADDI, but also JALR
@@ -129,24 +134,24 @@ module id_stage #(
             // ----------------------------- LOADS -------------------------------
             `OPCODE_L: begin
                 instr_type  = `I_TYPE;
-                destination = instr[11:7];
-                rs1         = instr[19:15];
+                // rd = instr[11:7];
+                // rs1         = instr[19:15];
                 alu_op      = `ALU_OP_ADD; // Is always addition, no matter what
             end
             // ----------------------------- STORES ------------------------------
             `OPCODE_S: begin
                 instr_type  = `S_TYPE;
                 alu_op      = {1'b0, instr[14:12]};
-                rs1         = instr[19:15];
-                rs2         = instr[24:20];
+                // rs1         = instr[19:15];
+                // rs2         = instr[24:20];
                 alu_op      = `ALU_OP_ADD; // Saves are always additions
             end
             // ----------------------------- BRANCH ------------------------------
             `OPCODE_B: begin // B-type
                 instr_type  = `B_TYPE;
                 alu_op      = {1'b0, instr[14:12]};
-                rs1         = instr[19:15];
-                rs2         = instr[24:20];
+                // rs1         = instr[19:15];
+                // rs2         = instr[24:20];
 
                 case (func3)
                     3'b000, 3'b001: alu_op = `ALU_OP_SUB;   // BEQ/BNE
@@ -157,13 +162,13 @@ module id_stage #(
             // ---------------------------- LUI/AUIPC ----------------------------
             `OPCODE_U_LUI, `OPCODE_U_AUIPC: begin // LUI, AUIPC
                 instr_type  = `U_TYPE;
-                destination = instr[11:7];
+                // rd = instr[11:7];
                 alu_op      = `ALU_OP_PASS;
             end
             // ---------------------------- JUMP ---------------------------------
             `OPCODE_JAL: begin // JAL
                 instr_type  = `J_TYPE;
-                destination = instr[11:7];
+                // rd = instr[11:7];
                 alu_op      = `ALU_OP_ADD;
             end
             // ---------------------------- NOP ----------------------------------
@@ -178,7 +183,7 @@ module id_stage #(
     assign mem_read         = (opcode == `OPCODE_L);
     assign mem_write        = (instr_type == `S_TYPE);
     assign mem_to_reg       = (opcode == `OPCODE_L);    // For future use
-    assign reg_write_out    = (destination != 5'd0); 
+    assign reg_write_out    = ((rd != 5'd0) && ((instr_type != `S_TYPE) && (instr_type != `B_TYPE))); 
     
     assign alu_src          = (instr_type == `I_TYPE || instr_type == `U_TYPE ||
                                 instr_type == `S_TYPE || instr_type == `NOP_TYPE);
