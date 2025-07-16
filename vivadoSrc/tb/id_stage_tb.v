@@ -99,7 +99,7 @@ module id_stage_tb #(
                                 // mem_to_reg/mem_write/mem_read/branch/jump = 0, alu_op = 1000
         reg_write = 1;          
         rd_select = 5'd29;      
-        rd_data = 32'h00011000; // x29 := 69632
+        rd_data = 32'd69632;    // x29 := 69632
 
         @(posedge clk);
         instr = 32'h00000000;   // Clear instruction
@@ -113,9 +113,9 @@ module id_stage_tb #(
                                 // Should see reg_write_out = 1 and mem_write = 0,
                                 // mem_to_reg/mem_read/alu_src/branch/jump = 0, alu_op = 0000
 
-        reg_write = 1;          // Write the result to the 
-        rd_select = 5'd24;      // x24 register, simulating the add instruction
-        rd_data = 32'h00011000; // x24 := 69644
+        reg_write = 1;          
+        rd_select = 5'd24;      // Write add to x24 register
+        rd_data = 32'd69644;    // x24 := 69644
 
         @(posedge clk);         // Give ID a load instruction
         instr = 32'h200c2803;   // lw x18, 512(x24) -> data1 = 69644 & data2 = 512
@@ -131,11 +131,32 @@ module id_stage_tb #(
                                 // Should see mem_write/alu_src = 1 &
                                 // mem_to_reg/mem_read/reg_write_out/branch/jump = 0, alu_op = 0000
 
-        reg_write = 0;          
-        rd_select = 5'b0;      // Load a 71 from memory into x18 
-        rd_data = 32'b0;
+        reg_write = 1;          
+        rd_select = 5'd15;       
+        rd_data = 32'd134;
 
-        @(posedge clk);
+        @(posedge clk);         // Give ID a B type instruction
+        instr = 32'h12fc5863;   // bge x24, x15, 304 -> data1 = 69644 & data 2 = 134
+                                // Should see branch = 1 & 
+                                // mem_read/mem_write/mem_to_reg/reg_write_out/alu_src/jump = 0
+
+        reg_write = 0;          
+        rd_select = 5'd0;       
+        rd_data = 32'd0;        // Disable writes for test
+
+        @(posedge clk);         // Give ID a J type instruction
+        instr = 32'h701010ef;   // jal x1, 7936 -> data1 = 0 & data2 = 0
+                                // Should see jump/alu_src/reg_write_out = 1 & 
+                                // branch/mem_read/mem_write/mem_to_reg = 0
+
+        @(posedge clk);         // Give ID a U type instruction
+        instr = 32'h06714ab7;   // lui x21, 26388 -> data1 = 0 & data2 = 0
+                                // Should see reg_write_out/alu_src = 1 &
+                                // branch/mem_read/mem_write/mem_to_reg/jump =0
+
+        #20
+
+        $finish;
 
     end
 

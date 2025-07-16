@@ -161,7 +161,7 @@ module id_stage #(
             `OPCODE_U_LUI, `OPCODE_U_AUIPC: begin // LUI, AUIPC
                 instr_type  = `U_TYPE;
                 destination = instr[11:7];
-                alu_op      = `ALU_OP_ADD;
+                alu_op      = `ALU_OP_PASS;
             end
             // ---------------------------- JUMP ---------------------------------
             `OPCODE_JAL: begin // JAL
