@@ -41,4 +41,4 @@ EAStep()
      fi
 }
 
-EAStep vivado -log immd_gen.vds -m64 -product Vivado -mode batch -messageDb vivado.pb -notrace -source immd_gen.tcl
+EAStep vivado -log id_stage.vds -m64 -product Vivado -mode batch -messageDb vivado.pb -notrace -source id_stage.tcl

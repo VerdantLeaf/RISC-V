@@ -29,7 +29,6 @@ module id_stage #(
     ADDR_SIZE = 10
 
     )(
-    
     input clk, 
     input rst,
 
@@ -38,9 +37,9 @@ module id_stage #(
     input [WORD_SIZE - 1 : 0] rd_data,          // Data to be written to the register file
     input [REG_SEL - 1 : 0] rd_select,          // The select bits for the write back
 
-    output reg [WORD_SIZE - 1 : 0] immd,        // Immediate extracted from immediate decode
-    output reg [WORD_SIZE - 1 : 0] data1,       // First data from the register file
-    output reg [WORD_SIZE - 1 : 0] data2,       // Second data from register file (src_immd determines valid)
+    output [WORD_SIZE - 1 : 0] immd,            // Immediate extracted from immediate decode
+    output [WORD_SIZE - 1 : 0] data1,           // First data from the register file
+    output [WORD_SIZE - 1 : 0] data2,           // Second data from register file (src_immd determines valid)
     output reg [3:0] alu_op,                    // Tells the ALU which operation to do 
     output reg [REG_SEL - 1 : 0] destination,   // The destination register for the instruction
 
@@ -90,7 +89,7 @@ module id_stage #(
         instr_type  = `NOP_TYPE;
 
         case(opcode)
-            // ------------------------------ R-TYPE ------------------------------
+            // ------------------------------ R-TYPE -----------------------------
             `OPCODE_R: begin // R-type
                 instr_type  = `R_TYPE;
                 destination = instr[11:7]; // This you would have to change manually?
@@ -111,7 +110,7 @@ module id_stage #(
                 endcase
 
             end
-            // ----------------------------- I-TYPE -------------------------------
+            // ----------------------------- I-TYPE ------------------------------
             `OPCODE_I, `OPCODE_JALR: begin
                 instr_type  = `I_TYPE;
                 destination = instr[11:7];
@@ -124,18 +123,18 @@ module id_stage #(
                     3'b011: alu_op = `ALU_OP_SLTU;
                     3'b100: alu_op = `ALU_OP_XOR;
                     3'b101: alu_op = (instr[30]) ? `ALU_OP_SRA : `ALU_OP_SRL;
-                    3'b110: alu_op = `ALU_OP_ORI;
-                    3'b111: alu_op = `ALU_OP_ANDI;
+                    3'b110: alu_op = `ALU_OP_OR;
+                    3'b111: alu_op = `ALU_OP_AND;
                 endcase
             end
-            // ----------------------------- LOADS --------------------------------
+            // ----------------------------- LOADS -------------------------------
             `OPCODE_L: begin
                 instr_type  = `I_TYPE;
                 destination = instr[11:7];
                 rs1         = instr[19:15];
                 alu_op      = `ALU_OP_ADD; // Is always addition, no matter what
             end
-            // ----------------------------- STORES -------------------------------
+            // ----------------------------- STORES ------------------------------
             `OPCODE_S: begin
                 instr_type  = `S_TYPE;
                 alu_op      = {1'b0, instr[14:12]};
@@ -151,10 +150,9 @@ module id_stage #(
                 rs2         = instr[24:20];
 
                 case (func3)
-                    3'0000, 3'b001: alu_op = `ALU_OP_SUB;   // BEQ/BNE
+                    3'b000, 3'b001: alu_op = `ALU_OP_SUB;   // BEQ/BNE
                     3'b100, 3'b101: alu_op = `ALU_OP_SLT;   // BLT/BGE
                     3'b110, 3'b111: alu_op = `ALU_OP_SLTU;  // BLTU/BGEU
-                    default: 
                 endcase
             end
             // ---------------------------- LUI/AUIPC ----------------------------
@@ -169,6 +167,7 @@ module id_stage #(
                 destination = instr[11:7];
                 alu_op      = `ALU_OP_ADD;
             end
+            // ---------------------------- NOP ----------------------------------
             default: begin
                 instr_type  = `NOP_TYPE;  // NOP encoded as ADDI x0, x0, 0
                 alu_op      = `ALU_OP_ADD;    
@@ -180,7 +179,7 @@ module id_stage #(
     assign mem_write = (instr_type == `S_TYPE) ? 1'b1 : 1'b0;
     // x0 can't be written to, so we'll default to 0, and change if we are writing to
     // Even if you are trying to intentionally or unintnetionally write to x0, it will fail
-    assign reg_write = (destination != 5'd0) ? 1'b1 : 1'b0; 
+    assign write_reg = (destination != 5'd0) ? 1'b1 : 1'b0; 
     
     assign src_immd = (instr_type == (`I_TYPE || `NOP_TYPE)) ? 1'b1 : 1'b0;
     assign branch = (instr_type == `B_TYPE) ? 1'b1 : 1'b0;

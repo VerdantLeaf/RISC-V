@@ -84,12 +84,12 @@ module id_stage_tb #(
         rd_data = 32'b0;
         rd_select = {REG_SEL{1'b0}};
 
-        @posedge(Clk);
+        @(posedge clk);
         rst = 0;
 
         #20 // SHow that all zeros shows no 
 
-        @posedge(clk);          // Give ID an I type instruction
+        @(posedge clk);          // Give ID an I type instruction
         instr = 32'h00c00713;   // addi x14, x0, 12 -> data1 = 0, data2 = 12
                                 // Should see src_immd/write_reg = 1 &
                                 // mem_write/mem_read/branch = 0, alu_op = 1000
@@ -97,14 +97,14 @@ module id_stage_tb #(
         rd_select = 5'd29;      
         rd_data = 32'h00011000; // x29 := 69632
 
-        @posedge(clk);
+        @(posedge clk);
         instr = 32'h00000000;   // Clear instruction
 
         reg_write = 1;          
         rd_select = 5'd14;      // write the 12 from to x14
         rd_data = 32'd12;       // x14 := 12
 
-        @posedge(clk);          // Give ID an R-type instruction
+        @(posedge clk);          // Give ID an R-type instruction
         instr = 32'h00ee8c33;   // add x24, x29, x14 -> data1 = 69632 & data2 = 12
                                 // Should see write_reg = 1 and mem_write = 0,
                                 // mem_read/src_immd/branch = 0, alu_op = 0000
@@ -113,7 +113,7 @@ module id_stage_tb #(
         rd_select = 5'd24;      // x24 register, simulating the add instruction
         rd_data = 32'h00011000; // x24 := 69644
 
-        @posedge(clk);          // Give ID a load instruction
+        @(posedge clk);          // Give ID a load instruction
         instr = 32'h200c2803;   // lw x18, 512(x24) -> data1 = 69644 & data2 = 512
                                 // Should see write_reg/mem_read/src_immd = 1 &
                                 // mem_write/branch = 0, alu_op = 1010
@@ -122,7 +122,7 @@ module id_stage_tb #(
         rd_select = 5'd18;      // Load a 71 from memory into x18 
         rd_data = 32'd71;       // x18 := 71
 
-        @posedge(clk);          // Give ID an S type instruction
+        @(posedge clk);          // Give ID an S type instruction
         instr = 32'hed071fa3;   // sh x16, -289(x14) -> data1 = 12 & data2 = -289
                                 // Should see mem_write/src_immd = 1 &
                                 // mem_read/write_reg/branch =0, alu_op = 
