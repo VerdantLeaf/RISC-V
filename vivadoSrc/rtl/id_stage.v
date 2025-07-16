@@ -39,16 +39,18 @@ module id_stage #(
 
     output [WORD_SIZE - 1 : 0] immd,            // Immediate extracted from immediate decode
     output [WORD_SIZE - 1 : 0] data1,           // First data from the register file
-    output [WORD_SIZE - 1 : 0] data2,           // Second data from register file (src_immd determines valid)
+    output [WORD_SIZE - 1 : 0] data2,           // Second data from register file (alu_src determines valid)
     output reg [3:0] alu_op,                    // Tells the ALU which operation to do 
     output reg [REG_SEL - 1 : 0] destination,   // The destination register for the instruction
 
-    output write_reg,                           // Says if instruction writes to a register
-    output mem_write,                           // Says if instruction writes to memory
-    output mem_read,                            // Says if instruction reads from memory
-    output src_immd,                            // 1 => Use immd, 0 => Use data 2 (Selector for mux)
-    output branch                               // Says if instruction branches            
-
+    output mem_read,                            // Instruction reads from memory
+    output mem_write,                           // Instruction writes to memory
+    output mem_to_reg,                          // Instruction writes to regfile from memory
+    output reg_write_out                        // Instruction writes to regfile
+    output alu_src,                             // Instruction uses immd or not
+    output branch,                              // Instruction is branch
+    output jump                                 // Instruction is jump
+    
     );
 
     reg [REG_SEL - 1 : 0] rs1, rs2;
@@ -63,7 +65,7 @@ module id_stage #(
         .rs1(rs1),
         .rs1Data(data1),
         .rs2(rs2),
-        .rs2Data(data2),
+        .rs2Da      ta(data2),
 
         .wCtrl(reg_write),
         .wSel(rd_select),
@@ -175,14 +177,15 @@ module id_stage #(
         endcase
     end
 
-    assign mem_read = (instr_type == (`I_TYPE && `OPCODE_L)) ? 1'b1 : 1'b0;
-    assign mem_write = (instr_type == `S_TYPE) ? 1'b1 : 1'b0;
-    // x0 can't be written to, so we'll default to 0, and change if we are writing to
-    // Even if you are trying to intentionally or unintnetionally write to x0, it will fail
-    assign write_reg = (destination != 5'd0) ? 1'b1 : 1'b0; 
+    // Set control signals for output
+    assign mem_read         = (opcode == `OPCODE_L);
+    assign mem_write        = (instr_type == `S_TYPE);
+    assign mem_to_reg       = (opcode == `OPCODE_L);    // For future use
+    assign reg_write_out    = (destination != 5'd0); 
     
-    assign src_immd = (instr_type == (`I_TYPE || `NOP_TYPE)) ? 1'b1 : 1'b0;
-    assign branch = (instr_type == `B_TYPE) ? 1'b1 : 1'b0;
-    
+    assign alu_src          = (instr_type == `I_TYPE || instr_type == `U_TYPE ||
+                                instr_type == `S_TYPE || instr_type == `NOP_TYPE);
+    assign branch           = (instr_type == `B_TYPE);
+    assign jump             = (instr_type == `J_TYPE || opcode == `OPCODE_JALR);
 
 endmodule

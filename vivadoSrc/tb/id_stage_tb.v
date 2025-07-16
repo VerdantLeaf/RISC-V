@@ -44,11 +44,13 @@ module id_stage_tb #(
     reg [3:0] alu_op;
     reg [REG_SEL - 1:0] destination;
 
-    reg write_reg;
-    reg mem_write;
-    reg mem_read;
-    reg src_immd;
+    reg mem_read;   
+    reg mem_write;   
+    reg mem_to_reg;
+    reg reg_write_out;
+    reg alu_src;
     reg branch;
+    reg jump;
 
     id_stage dut(
         // inputs
@@ -59,18 +61,20 @@ module id_stage_tb #(
         .rd_data(rd_data),
         .rd_select(rd_select),
 
-        // outputs
+        // outputs - data
         .immd(immd),
         .data1(data1),
         .data2(data2),
         .alu_op(alu_op),
         .destination(destination),
-
-        .write_reg(write_reg),
-        .mem_write(mem_write),
+        // control signals
         .mem_read(mem_read),
-        .src_immd(src_immd),
-        .branch(branch)
+        .mem_write(mem_write),
+        .mem_to_reg(mem_to_reg),
+        .reg_write_out(reg_write_out),
+        .alu_src(alu_src),
+        .branch(branch),
+        .jump(jump)
     );
 
     initial clk = 0;
@@ -87,12 +91,12 @@ module id_stage_tb #(
         @(posedge clk);
         rst = 0;
 
-        #20 // SHow that all zeros shows no 
+        #20 // SHow that all zeros shows NOP
 
-        @(posedge clk);          // Give ID an I type instruction
+        @(posedge clk);         // Give ID an I type instruction
         instr = 32'h00c00713;   // addi x14, x0, 12 -> data1 = 0, data2 = 12
-                                // Should see src_immd/write_reg = 1 &
-                                // mem_write/mem_read/branch = 0, alu_op = 1000
+                                // Should see alu_src/reg_write_out = 1 &
+                                // mem_to_reg/mem_write/mem_read/branch/jump = 0, alu_op = 1000
         reg_write = 1;          
         rd_select = 5'd29;      
         rd_data = 32'h00011000; // x29 := 69632
@@ -104,28 +108,34 @@ module id_stage_tb #(
         rd_select = 5'd14;      // write the 12 from to x14
         rd_data = 32'd12;       // x14 := 12
 
-        @(posedge clk);          // Give ID an R-type instruction
+        @(posedge clk);         // Give ID an R-type instruction
         instr = 32'h00ee8c33;   // add x24, x29, x14 -> data1 = 69632 & data2 = 12
-                                // Should see write_reg = 1 and mem_write = 0,
-                                // mem_read/src_immd/branch = 0, alu_op = 0000
+                                // Should see reg_write_out = 1 and mem_write = 0,
+                                // mem_to_reg/mem_read/alu_src/branch/jump = 0, alu_op = 0000
 
         reg_write = 1;          // Write the result to the 
         rd_select = 5'd24;      // x24 register, simulating the add instruction
         rd_data = 32'h00011000; // x24 := 69644
 
-        @(posedge clk);          // Give ID a load instruction
+        @(posedge clk);         // Give ID a load instruction
         instr = 32'h200c2803;   // lw x18, 512(x24) -> data1 = 69644 & data2 = 512
-                                // Should see write_reg/mem_read/src_immd = 1 &
-                                // mem_write/branch = 0, alu_op = 1010
+                                // Should see reg_write_out/mem_to_reg/mem_read/alu_src = 1 &
+                                // mem_write/branch/jump = 0, alu_op = 1010
 
         reg_write = 1;          
         rd_select = 5'd18;      // Load a 71 from memory into x18 
         rd_data = 32'd71;       // x18 := 71
 
-        @(posedge clk);          // Give ID an S type instruction
-        instr = 32'hed071fa3;   // sh x16, -289(x14) -> data1 = 12 & data2 = -289
-                                // Should see mem_write/src_immd = 1 &
-                                // mem_read/write_reg/branch =0, alu_op = 
+        @(posedge clk);         // Give ID an S type instruction
+        instr = 32'hed071fa3;   // sh x16, -292(x14) -> data1 = 12 & data2 = -289
+                                // Should see mem_write/alu_src = 1 &
+                                // mem_to_reg/mem_read/reg_write_out/branch/jump = 0, alu_op = 0000
+
+        reg_write = 0;          
+        rd_select = 5'b0;      // Load a 71 from memory into x18 
+        rd_data = 32'b0;
+
+        @(posedge clk);
 
     end
 
