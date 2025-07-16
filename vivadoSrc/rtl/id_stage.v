@@ -54,6 +54,7 @@ module id_stage #(
 
     reg [REG_SEL - 1 : 0] rs1, rs2;
     reg [4:0] opcode;
+    reg [2:0] func3;
     reg [2:0] instr_type;
 
     regfile registerfile(
@@ -80,20 +81,25 @@ module id_stage #(
         
         // Decode the opcode to select the correct if statement
 
-        opcode = instr[6:2];
+        opcode      = instr[6:2];
+        func3       = instr[14:12]; // Ignore for J and U types
         destination = {REG_SEL{1'b0}};
-        rs1 = {REG_SEL{1'b0}};
-        rs2 = {REG_SEL{1'b0}};
+        rs1         = {REG_SEL{1'b0}};
+        rs2         = {REG_SEL{1'b0}};
+        alu_op      = `ALU_OP_ADD;
+        instr_type  = `NOP_TYPE;
 
         case(opcode)
+            // ------------------------------ R-TYPE ------------------------------
             `OPCODE_R: begin // R-type
-                instr_type = `R_TYPE;
-
+                instr_type  = `R_TYPE;
                 destination = instr[11:7]; // This you would have to change manually?
-                rs1 = instr[19:15];
-                rs2 = instr[24:20];
+                rs1         = instr[19:15];
+                rs2         = instr[24:20];
 
-                case(instr[14:12])
+                alu_op = {instr[30], instr[14:12]}; // ALU operations are just func7[5] + func3
+
+                case (func3)
                     3'b000: alu_op = (instr[30]) ? `ALU_OP_SUB : `ALU_OP_ADD;
                     3'b001: alu_op = `ALU_OP_SLL;
                     3'b010: alu_op = `ALU_OP_SLT;
@@ -104,47 +110,68 @@ module id_stage #(
                     3'b111: alu_op = `ALU_OP_AND;
                 endcase
 
-                alu_op = {instr[30], instr[14:12]}; // ALU operations are just func7[5] + func3
-
             end
-            `OPCODE_I, `OPCODE_L, `OPCODE_JALR: begin // I-type - immediate handled by generator
-                instr_type = `I_TYPE;
-
+            // ----------------------------- I-TYPE -------------------------------
+            `OPCODE_I, `OPCODE_JALR: begin
+                instr_type  = `I_TYPE;
                 destination = instr[11:7];
-                rs1 = instr[19:15];
-                alu_op = {instr[30], instr[14:12]};
+                rs1         = instr[19:15];
 
+                case (func3)
+                    3'b000: alu_op = `ALU_OP_ADD; // ADDI, but also JALR
+                    3'b001: alu_op = `ALU_OP_SLL;
+                    3'b010: alu_op = `ALU_OP_SLT;
+                    3'b011: alu_op = `ALU_OP_SLTU;
+                    3'b100: alu_op = `ALU_OP_XOR;
+                    3'b101: alu_op = (instr[30]) ? `ALU_OP_SRA : `ALU_OP_SRL;
+                    3'b110: alu_op = `ALU_OP_ORI;
+                    3'b111: alu_op = `ALU_OP_ANDI;
+                endcase
             end
-            `OPCODE_S: begin // S-type
-                instr_type = `S_TYPE;
-
-                alu_op = {1'b0, instr[14:12]};
-                rs1 = instr[19:15];
-                rs2 = instr[24:20];
-
+            // ----------------------------- LOADS --------------------------------
+            `OPCODE_L: begin
+                instr_type  = `I_TYPE;
+                destination = instr[11:7];
+                rs1         = instr[19:15];
+                alu_op      = `ALU_OP_ADD; // Is always addition, no matter what
             end
+            // ----------------------------- STORES -------------------------------
+            `OPCODE_S: begin
+                instr_type  = `S_TYPE;
+                alu_op      = {1'b0, instr[14:12]};
+                rs1         = instr[19:15];
+                rs2         = instr[24:20];
+                alu_op      = `ALU_OP_ADD; // Saves are always additions
+            end
+            // ----------------------------- BRANCH ------------------------------
             `OPCODE_B: begin // B-type
-                instr_type = `B_TYPE;
+                instr_type  = `B_TYPE;
+                alu_op      = {1'b0, instr[14:12]};
+                rs1         = instr[19:15];
+                rs2         = instr[24:20];
 
-                alu_op = {1'b0, instr[14:12]};
-                rs1 = instr[19:15];
-                rs2 = instr[24:20];
-
+                case (func3)
+                    3'0000, 3'b001: alu_op = `ALU_OP_SUB;   // BEQ/BNE
+                    3'b100, 3'b101: alu_op = `ALU_OP_SLT;   // BLT/BGE
+                    3'b110, 3'b111: alu_op = `ALU_OP_SLTU;  // BLTU/BGEU
+                    default: 
+                endcase
             end
+            // ---------------------------- LUI/AUIPC ----------------------------
             `OPCODE_U_LUI, `OPCODE_U_AUIPC: begin // LUI, AUIPC
-                instr_type = `U_TYPE;
-                // immd habdled by generator and passed to output
-                destination <= instr[11:7];
-            end
-            `OPCODE_JAL: begin // JAL
-                instr_type = `J_TYPE;
-                // immd handled by generator and passed to output
+                instr_type  = `U_TYPE;
                 destination = instr[11:7];
+                alu_op      = `ALU_OP_ADD;
+            end
+            // ---------------------------- JUMP ---------------------------------
+            `OPCODE_JAL: begin // JAL
+                instr_type  = `J_TYPE;
+                destination = instr[11:7];
+                alu_op      = `ALU_OP_ADD;
             end
             default: begin
-                instr_type = `NOP_TYPE;  
-                alu_op = `ALU_OP_ADD;    
-                // NOP encoded as ADDI x0, x0, 0
+                instr_type  = `NOP_TYPE;  // NOP encoded as ADDI x0, x0, 0
+                alu_op      = `ALU_OP_ADD;    
             end
         endcase
     end
