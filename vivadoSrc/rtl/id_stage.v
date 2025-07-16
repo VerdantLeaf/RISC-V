@@ -46,7 +46,7 @@ module id_stage #(
     output mem_read,                            // Instruction reads from memory
     output mem_write,                           // Instruction writes to memory
     output mem_to_reg,                          // Instruction writes to regfile from memory
-    output reg_write_out                        // Instruction writes to regfile
+    output reg_write_out,                       // Instruction writes to regfile
     output alu_src,                             // Instruction uses immd or not
     output branch,                              // Instruction is branch
     output jump                                 // Instruction is jump
@@ -65,7 +65,7 @@ module id_stage #(
         .rs1(rs1),
         .rs1Data(data1),
         .rs2(rs2),
-        .rs2Da      ta(data2),
+        .rs2Data(data2),
 
         .wCtrl(reg_write),
         .wSel(rd_select),
@@ -98,8 +98,6 @@ module id_stage #(
                 rs1         = instr[19:15];
                 rs2         = instr[24:20];
 
-                alu_op = {instr[30], instr[14:12]}; // ALU operations are just func7[5] + func3
-
                 case (func3)
                     3'b000: alu_op = (instr[30]) ? `ALU_OP_SUB : `ALU_OP_ADD;
                     3'b001: alu_op = `ALU_OP_SLL;
@@ -110,7 +108,6 @@ module id_stage #(
                     3'b110: alu_op = `ALU_OP_OR;
                     3'b111: alu_op = `ALU_OP_AND;
                 endcase
-
             end
             // ----------------------------- I-TYPE ------------------------------
             `OPCODE_I, `OPCODE_JALR: begin

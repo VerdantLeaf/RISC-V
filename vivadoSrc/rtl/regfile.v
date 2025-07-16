@@ -33,15 +33,15 @@ module regfile #(
     input [REG_SEL - 1:0] rs1,
     output [WORD_SIZE - 1:0] rs1Data,
     // Read port 2
-    input [REG_SEL - 1 - 1:0] rs2,
+    input [REG_SEL - 1:0] rs2,
     output [WORD_SIZE - 1:0] rs2Data,
     // Write port
     input wCtrl,
-    input [REG_SEL - 1 - 1:0] wSel,
+    input [REG_SEL - 1:0] wSel,
     input  wire [WORD_SIZE - 1:0] wData
     );
     
-    wire [NUM_REGS - 1:0] regOutput [0:WORD_SIZE - 1];
+    wire [WORD_SIZE - 1:0] regOutput [0: NUM_REGS - 1];
     wire [NUM_REGS - 1:0] wEnable;
 
     // Generate enable signals for registers
