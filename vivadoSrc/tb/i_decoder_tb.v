@@ -110,23 +110,35 @@ module i_decoder_tb #(
             0, 0, 0, 1, 0, 0, 0);
         #10;
         instr = 32'h00eb9013; // slli x0, x23, 14
+        #10;
         check_signals(`__LINE__, 5'd0, 5'd23, 5'd0, `ALU_OP_SLL,
             0, 0, 0, 0, 1, 0, 0);
         #10;
-        // check signals
+        instr = 32'h124e2903; // lw x18, 292(x28)
         #10;
-        // instr
+        check_signals(`__LINE__, 5'd18, 5'd28, 5'd0, `ALU_OP_ADD,
+            1, 0, 1, 1, 1, 0, 0);
         #10;
-        // check signals
+        instr = 32'h634c80e7; // jalr x1, 1588(x25)
         #10;
-        // instr
+        check_signals(`__LINE__, 5'd1, 5'd25, 5'd0, `ALU_OP_ADD,
+            0, 0, 0, 1, 1, 0, 1);
         #10;
-        // check signals
+        instr = 32'h1d131623; // sh x17, 460(x6)
         #10;
-        // instr
+        check_signals(`__LINE__, 5'd0, 5'd6, 5'd17, `ALU_OP_ADD,
+            0, 1, 0, 0, 0, 0, 0);
         #10;
-        // check signals
+        instr = 32'h2d335a63; // bge x6, x19, 724
         #10;
+        check_signals(`__LINE__, 5'd0, 5'd6, 5'd19, `ALU_OP_SLT,
+            0, 0, 0, 0, 1, 1, 0);
+        instr = 32'h1d131623; // beq x31, x30, 204
+        #10;
+        check_signals(`__LINE__, 5'd0, 5'd6, 5'd17, `ALU_OP_SUB,
+            0, 0, 0, 0, 1, 1, 0);
+
+        // need to add U and J type instructions to complete test procedure
 
         $finish;
     end
