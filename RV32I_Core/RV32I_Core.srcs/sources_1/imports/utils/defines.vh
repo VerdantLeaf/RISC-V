@@ -1,3 +1,6 @@
+`ifndef DEFINES_VH
+`define DEFINES_VH
+
 `define OPCODE_R   5'b01100
 `define OPCODE_I   5'b00100
 `define OPCODE_L   5'b00000
@@ -27,3 +30,5 @@
 `define ALU_OP_OR   4'b0110
 `define ALU_OP_AND  4'b0111
 `define ALU_OP_PASS 4'b1111
+
+`endif

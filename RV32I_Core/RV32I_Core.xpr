@@ -60,7 +60,7 @@
     <Option Name="IPStaticSourceDir" Val="$PIPUSERFILESDIR/ipstatic"/>
     <Option Name="EnableBDX" Val="FALSE"/>
     <Option Name="DSABoardId" Val="arty-s7-25"/>
-    <Option Name="WTXSimLaunchSim" Val="110"/>
+    <Option Name="WTXSimLaunchSim" Val="112"/>
     <Option Name="WTModelSimLaunchSim" Val="0"/>
     <Option Name="WTQuestaLaunchSim" Val="0"/>
     <Option Name="WTIesLaunchSim" Val="0"/>
@@ -94,7 +94,7 @@
       <File Path="$PSRCDIR/sources_1/imports/utils/defines.vh">
         <FileInfo>
           <Attr Name="ImportPath" Val="$PPRDIR/../vivadoSrc/utils/defines.vh"/>
-          <Attr Name="ImportTime" Val="1752683389"/>
+          <Attr Name="ImportTime" Val="1752783162"/>
           <Attr Name="UsedIn" Val="synthesis"/>
           <Attr Name="UsedIn" Val="simulation"/>
           <Attr Name="IsVisible" Val="1"/>
@@ -423,21 +423,22 @@
     </FileSet>
     <FileSet Name="id_stage_sim" Type="SimulationSrcs" RelSrcDir="$PSRCDIR/id_stage_sim" RelGenDir="$PGENDIR/id_stage_sim">
       <Filter Type="Srcs"/>
+      <File Path="$PPRDIR/../vivadoSrc/tb/i_decoder_tb.v">
+        <FileInfo>
+          <Attr Name="UsedIn" Val="synthesis"/>
+          <Attr Name="UsedIn" Val="implementation"/>
+          <Attr Name="UsedIn" Val="simulation"/>
+        </FileInfo>
+      </File>
       <File Path="$PPRDIR/../vivadoSrc/tb/id_stage_tb.v">
         <FileInfo>
+          <Attr Name="AutoDisabled" Val="1"/>
           <Attr Name="UsedIn" Val="synthesis"/>
           <Attr Name="UsedIn" Val="implementation"/>
           <Attr Name="UsedIn" Val="simulation"/>
         </FileInfo>
       </File>
       <File Path="$PPRDIR/../vivadoSrc/tb/immd_gen_tb.v">
-        <FileInfo>
-          <Attr Name="UsedIn" Val="synthesis"/>
-          <Attr Name="UsedIn" Val="implementation"/>
-          <Attr Name="UsedIn" Val="simulation"/>
-        </FileInfo>
-      </File>
-      <File Path="$PPRDIR/../vivadoSrc/tb/i_decoder_tb.v">
         <FileInfo>
           <Attr Name="AutoDisabled" Val="1"/>
           <Attr Name="UsedIn" Val="synthesis"/>
