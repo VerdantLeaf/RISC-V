@@ -86,10 +86,10 @@ module i_decoder_tb #(
                 branch        !== e_branch        ||
                 jump          !== e_jump) begin
             // Vivado prefers this all on one line lol
-            $display("LINE FAIL @ line %0d:\nExp: alu= %b, mem_read= %b, mem_write= %b, mem_to_reg= %b, reg_write_out= %b, alu_src= %b, branch= %b, jump= %b\nGot: alu= %b, mem_read= %b, mem_write= %b, mem_to_reg= %b, reg_write_out= %b, alu_src= %b, branch= %b, jump= %b",
+            $display("CTRL FAIL @ line %0d:\nExp: alu= %b, mem_read= %b, mem_write= %b, mem_to_reg= %b, reg_write_out= %b, alu_src= %b, branch= %b, jump= %b\nGot: alu= %b, mem_read= %b, mem_write= %b, mem_to_reg= %b, reg_write_out= %b, alu_src= %b, branch= %b, jump= %b",
                 line_num, e_alu_op, e_mem_read, e_mem_write, e_mem_to_reg, e_reg_write_out, e_alu_src, e_branch, e_jump, alu_op, mem_read, mem_write, mem_to_reg, reg_write_out, alu_src, branch, jump);
             end else begin
-                $display("LINE PASS @ line %0d", line_num);
+                $display("CTRL PASS @ line %0d", line_num);
             end
         end
     endtask
@@ -127,19 +127,26 @@ module i_decoder_tb #(
         instr = 32'h1d131623; // sh x17, 460(x6)
         #10;
         check_signals(`__LINE__, 5'd0, 5'd6, 5'd17, `ALU_OP_ADD,
-            0, 1, 0, 0, 0, 0, 0);
+            0, 1, 0, 0, 1, 0, 0);
         #10;
         instr = 32'h2d335a63; // bge x6, x19, 724
         #10;
         check_signals(`__LINE__, 5'd0, 5'd6, 5'd19, `ALU_OP_SLT,
             0, 0, 0, 0, 1, 1, 0);
-        instr = 32'h1d131623; // beq x31, x30, 204
+        instr = 32'h7fef8c63; // beq x31, x30, 204
         #10;
-        check_signals(`__LINE__, 5'd0, 5'd6, 5'd17, `ALU_OP_SUB,
+        check_signals(`__LINE__, 5'd0, 5'd31, 5'd30, `ALU_OP_SUB,
             0, 0, 0, 0, 1, 1, 0);
+        instr = 32'h0acbda37; // lui x20, 44221
+        #10;
+        check_signals(`__LINE__, 5'd20, 5'd0, 5'd0, `ALU_OP_PASS,
+            0, 0, 0, 1, 1, 0, 0);
+        instr = 32'h772070ef; // jal x1, 30578
+        #10;
+        check_signals(`__LINE__, 5'd1, 5'd0, 5'd0, `ALU_OP_ADD,
+            0, 0, 0, 1, 1, 0, 1);
 
-        // need to add U and J type instructions to complete test procedure
-
+        #20;
         $finish;
     end
 
