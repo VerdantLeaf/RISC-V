@@ -70,7 +70,7 @@ module i_decoder_tb #(
         input e_mem_read, e_mem_write, e_mem_to_reg, e_reg_write_out, e_alu_src, e_branch, e_jump;
         begin
             
-            if (rd !== e_rd || rs1 !== e_rs1 || rs2 !== e_rs2) begin 
+            if (rd !== e_rd || rs1 !== e_rs1 || rs2 !== e_rs2 || alu_op !== e_alu_op) begin 
                 $display("REG FAIL @ line %0d:\nExp: rd= %d, rs1= %d, rs2= %d\nGot: rd= %d, rs1= %d, rs2= %d",
                     line_num, e_rd, e_rs1, e_rs2, rd, rs1, rs2);
             end else begin

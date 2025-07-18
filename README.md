@@ -1,9 +1,13 @@
 # Status:
 
-I think developing a non-pipelined CPU first would have been a good idea, but I have learned so much from this project, that I want to keep going. I didn't expect to get very sick or have the other issues this summer, but I am back. I am focused on making this an interesting project, more than anything. I never thought this would be easy and I have learned a ton, so it's been a success in that metric, but I would really like to have something concrete to show for it.
+I am nearly complete with the ID stage. New additions to my understanding include how to build out tasks in testbenches and utilizing verilog header files. The tasks are very useful to check expected signals with what the module is generating. The header files are nice to work with in Vivado, but can be annoying when Vivado doesn't recognize that they exist. 
+
+I learned that with how I set a project setting, Vivado makes a copy of each file internally, and then doesn't reference the files in the VivadoSrc directory. This means that when I use VSCode to edit files and go into Vivado, I have to reload the files, but also that the two can get a little out of sync. Future knowledge to uncheck the "copy to project" setting when setting up the project. 
+
+I am hopeful to have a completed and verified design, however, regardless, I've learned a whole lot and have most certainly become a better hardware designer. I've done everything here myself, and while that may have slowed me down a little, compared to working in a professional seting, I've had to learn it *all*.
 
 # RISC-V
-RISC-V implementation. Design and implementation of a 5-stage pipelines RV32I RISC-V processor in Verilog with a Harvard memory architecture. 
+RISC-V implementation. Design and implementation of a 5-stage pipelines RV32I RISC-V processor in Verilog with a Harvard memory architecture. Utilizing the pipeline means developing each stage as well as units to handle the forwarding and branching. 
 
 ## Goals
 
@@ -17,9 +21,22 @@ For simulation, programs can be ran/added by generating the .mem file and then m
 
 ## Current status:
 
+- ID stage should be complete and starting to testbench.
+- Instruction decoder has been completed and testbenched.
+- Immediate generator has been completed and testbenched.
 - Register file design has been completed and testbenched.
-- 4KB of instruction memory has been added and testbenched. 
-- IF/ID register is complete
+- 4KB of instruction memory has been completed and testbenched. 
+- IF/ID register is complete.
 - IF stage is complete and testbenched.
 - Data memory first complete draft completed. 1R1RW port setup
 - Parameterization of regfile, i/d_mem and if_stage complete
+
+## Future ideas/add ons:
+- L1 instruction and/or data cache
+- Prefetcher for instructions
+- Out of order execution
+- GShare branch prediction
+- UART instruction injection to enable co-processor support for an STM32 Nucleo board/custom PCB
+- Tiny GPU add on/custom instructions
+- VonNeumann architecture with 1R/1RW memory
+- More advanced ALU (Dadda multiplier)
