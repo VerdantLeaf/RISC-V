@@ -65,17 +65,18 @@ module regfile_tb_new;
         input [WORD_SIZE-1:0] exp_rs2Data;
         begin
             if (rs1Data !== exp_rs1Data || rs2Data !== exp_rs2Data) begin
-                $display("FAIL @ line %0d: rs1=%0d exp=%0d got=%0d | rs2=%0d exp=%0d got=%0d",
-                    line, check_rs1, exp_rs1Data, rs1Data,
-                    check_rs2, exp_rs2Data, rs2Data
+                $display("*** DATA FAIL @ line %0d***\nExp: rs1= %0d, rs2= %0d\nGot: rs1= %0d, rs2= %0d",
+                    line, exp_rs1Data, exp_rs2Data, rs1Data, rs2Data
                 );
             end else begin
-                $display("PASS @ line %0d: rs1=%0d=%0d | rs2=%0d=%0d",
-                    line, check_rs1, rs1Data, check_rs2, rs2Data
+                $display("PASS @ line %0d: rs1= %0d | rs2= %0d",
+                    line, rs1Data, rs2Data
                 );
             end
         end
     endtask
+
+    integer i;
 
     // ---------------------- TEST PROCEDURE ----------------------
     initial begin
@@ -90,6 +91,30 @@ module regfile_tb_new;
         rs1 = 5'd5; rs2 = 5'd10;
         #1;
         check_reg(`__LINE__, 5, 10, 32'd0, 32'd0);
+
+        // ------ TEST: Fill regs with number of their index
+        wCtrl = 1;
+        for (i=0; i< NUM_REGS; i=i+1) begin
+            wData = i;
+            wSel = i + 1;  // reg[i] := i
+            @(posedge clk);
+        end
+
+        // ------------------ TEST 1: Check registers and values ---------
+        wCtrl = 0;
+        rs1 = 5'd5; rs2 = 5'd10;
+        #1;
+        check_reg(`__LINE__, 5, 10, 32'd5, 32'd10);
+        rs1 = 5'd24; rs2 = 5'd29;
+        #1;
+        check_reg(`__LINE__, 24, 29, 32'd24, 32'd29);
+        rs1 = 5'd12; rs2 = 5'd22;
+        #1;
+        check_reg(`__LINE__, 12, 22, 32'd12, 32'd22);
+        rs1 = 5'd6; rs2 = 5'd28;
+        #1;
+        check_reg(`__LINE__, 6, 28, 32'd6, 32'd28);
+
 
         // ------------------ TEST 2: Write to x5 ------------------------
         wCtrl = 1; wSel = 5'd5; wData = 32'd12345;

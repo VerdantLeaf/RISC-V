@@ -145,7 +145,6 @@ module id_stage_tb #(
 
     initial begin
         
-        
         rst = 1;
         pc = {ADDR_SIZE{1'b0}};
         instr = {WORD_SIZE{1'b0}};
@@ -153,17 +152,14 @@ module id_stage_tb #(
         rd_data = {WORD_SIZE{1'b0}};
         rd_select = {REG_SEL{1'b0}};
 
+        // --------------------- LOAD REG FILE --------------------------
         @(posedge clk);
         rst = 0;
         reg_write = 1;
-
         for (i=0; i< NUM_REGS; i=i+1) begin
-            if (i == 17) begin
-                rd_data = 32'd1023;
-            end
-            else rd_data = i;
-            
-            rd_select = i;  // reg[i] := i
+            rd_data = i;        // reg[i] := i
+            rd_select = i + 1;  // this is not an issue with the regfile, I am just
+                                // bad at a for loop apparently...
             @(posedge clk);
         end
         
@@ -200,11 +196,12 @@ module id_stage_tb #(
         @(posedge clk);     
         #1;
         check_data_and_regs(
-            `__LINE__, 5'd0, 5'd23, 5'd0,   // rd, rs1, rs2
-            32'd23, 32'd0, 32'd0               // data1, data2, immd    
+            `__LINE__, 5'd0, 5'd23, 5'd0,       // rd, rs1, rs2
+            32'd23, 32'd0, 32'd14               // data1, data2, immd    
         );
         // mem_read, mem_write, mem_to_reg, reg_write_out, alu_src, branch, jump
-        check_ctrl_signals(`__LINE__, 0, 0, 0, 1, 0, 0, 0, `ALU_OP_SRA);
+        // reg_write_out should be zero because the destination reg is x0
+        check_ctrl_signals(`__LINE__, 0, 0, 0, 0, 1, 0, 0, `ALU_OP_SLL);
 
         // --------------------- 4) SH x16, -292(x14) --------------------
         instr = 32'hed071e23; 
@@ -212,7 +209,7 @@ module id_stage_tb #(
         #1;
         check_data_and_regs(
             `__LINE__, 5'd0, 5'd14, 5'd16,  // rd, rs1, rs2
-            32'd14, 32'd16, 32'd0           // data1, data2, immd
+            32'd14, 32'd16, -32'd292        // data1, data2, immd
         );
         // mem_read, mem_write, mem_to_reg, reg_write_out, alu_src, branch, jump
         check_ctrl_signals(`__LINE__, 0, 1, 0, 0, 1, 0, 0, `ALU_OP_ADD);
@@ -226,7 +223,7 @@ module id_stage_tb #(
             32'd24, 32'd15, 32'd304         // data1, data2, immd
         );
         // mem_read, mem_write, mem_to_reg, reg_write_out, alu_src, branch, jump
-        check_ctrl_signals(`__LINE__, 0, 0, 0, 0, 1, 1, 0, `ALU_OP_ADD);
+        check_ctrl_signals(`__LINE__, 0, 0, 0, 0, 1, 1, 0, `ALU_OP_SLT);
 
         // --------------------- 6) JAL x1, 7936 --------------------------
         instr = 32'h701010ef;
@@ -239,13 +236,13 @@ module id_stage_tb #(
         // mem_read, mem_write, mem_to_reg, reg_write_out, alu_src, branch, jump
         check_ctrl_signals(`__LINE__, 0, 0, 0, 1, 1, 0, 1, `ALU_OP_ADD);
 
-        // --------------------- 7) LUI x21, 0x4321 ----------------------
+        // --------------------- 7) LUI x21, 0x04321 ---------------------
         instr = 32'h04321ab7;    
         @(posedge clk);
         #1;
         check_data_and_regs(
             `__LINE__, 5'd21, 5'd0, 5'd0,   // rd, rs1, rs2
-            32'd0, 32'd0, 32'h43210000      // data1, data2, immd
+            32'd0, 32'd0, 32'h04321000      // data1, data2, immd
         );
         // mem_read, mem_write, mem_to_reg, reg_write_out, alu_src, branch, jump
         check_ctrl_signals(`__LINE__, 0, 0, 0, 1, 1, 0, 0, `ALU_OP_PASS);

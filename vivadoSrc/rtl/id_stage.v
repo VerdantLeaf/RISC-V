@@ -73,7 +73,7 @@ module id_stage #(
     regfile registerfile(
         .clk(clk),
         .rst(rst),
-        // Read selects and outputs
+        // Input selects and data outputs
         .rs1(rs1_sel),
         .rs1Data(data1),
         .rs2(rs2_sel),
