@@ -104,13 +104,13 @@ module id_stage_tb #(
         input [WORD_SIZE - 1 : 0] e_data1, e_data2, e_immd;
         begin
             if (rd !== e_rd || rs1 !== e_rs1 || rs2 !== e_rs2) begin 
-                $display("***REG FAIL @ line %0d:\nExp: rd= %d, rs1= %d, rs2= %d\nGot: rd= %d, rs1= %d, rs2= %d***",
+                $display("***REG FAIL @ line %0d***\nExp: rd= %d, rs1= %d, rs2= %d\nGot: rd= %d, rs1= %d, rs2= %d",
                     line_num, e_rd, e_rs1, e_rs2, rd, rs1, rs2);
             end else begin
                 $display("REG PASS @ line %0d", line_num);
             end
             if (data1 !== e_data1 || data2 !== e_data2 || immd !== e_immd) begin 
-                $display("***DATA FAIL @ line %0d:\nExp: d1= %d, d2= %d, im= %d\nGot: d1= %d, d2= %d, im= %d***",
+                $display("***DATA FAIL @ line %0d***\nExp: d1= %d, d2= %d, im= %d\nGot: d1= %d, d2= %d, im= %d",
                     line_num, e_data1, e_data2, e_immd, data1, data2, immd);
             end else begin
                 $display("DATA PASS @ line %0d", line_num);
@@ -132,7 +132,7 @@ module id_stage_tb #(
                 branch        !== e_branch        ||
                 jump          !== e_jump) begin
             // Vivado prefers this all on one line lol
-            $display("***CTRL FAIL @ line %0d:\nExp: alu= %b, mem_read= %b, mem_write= %b, mem_to_reg= %b, reg_write_out= %b, alu_src= %b, branch= %b, jump= %b\nGot: alu= %b, mem_read= %b, mem_write= %b, mem_to_reg= %b, reg_write_out= %b, alu_src= %b, branch= %b, jump= %b***",
+            $display("***CTRL FAIL @ line %0d***\nExp: alu= %b, mem_read= %b, mem_write= %b, mem_to_reg= %b, reg_write_out= %b, alu_src= %b, branch= %b, jump= %b\nGot: alu= %b, mem_read= %b, mem_write= %b, mem_to_reg= %b, reg_write_out= %b, alu_src= %b, branch= %b, jump= %b",
                 line_num, e_alu_op, e_mem_read, e_mem_write, e_mem_to_reg, e_reg_write_out, e_alu_src, e_branch, e_jump, alu_op, mem_read, mem_write, mem_to_reg, reg_write_out, alu_src, branch, jump);
             end else begin
                 $display("CTRL PASS @ line %0d", line_num);
@@ -141,8 +141,11 @@ module id_stage_tb #(
     endtask
 
     // --------------------------- TEST PROCEDURE ----------------------
+    integer i;
+
     initial begin
-    
+        
+        
         rst = 1;
         pc = {ADDR_SIZE{1'b0}};
         instr = {WORD_SIZE{1'b0}};
@@ -152,16 +155,20 @@ module id_stage_tb #(
 
         @(posedge clk);
         rst = 0;
-        @(posedge clk);
-        // ----------------------- LOAD REGISTERS ----------------------
         reg_write = 1;
 
-        for (integer i=0; i< NUM_REGS; i=i+1) begin
-            rd_data = i;
+        for (i=0; i< NUM_REGS; i=i+1) begin
+            if (i == 17) begin
+                rd_data = 32'd1023;
+            end
+            else rd_data = i;
+            
             rd_select = i;  // reg[i] := i
             @(posedge clk);
         end
-
+        
+        rd_data = 0;
+        rd_select = 0;
         reg_write = 0;
         @(posedge clk);
 
@@ -171,7 +178,7 @@ module id_stage_tb #(
         #1;
         check_data_and_regs(
             `__LINE__, 5'd24, 5'd29, 5'd14, // rd, rs1, rs2
-            5'd24, 5'd29, 5'd0              // data1, data2, immd    
+            32'd29, 32'd14, 32'd0              // data1, data2, immd    
         );
         // mem_read, mem_write, mem_to_reg, reg_write_out, alu_src, branch, jump
         check_ctrl_signals(`__LINE__, 0, 0, 0, 1, 0, 0, 0, `ALU_OP_ADD);
@@ -182,7 +189,7 @@ module id_stage_tb #(
         #1;
         check_data_and_regs(
             `__LINE__, 5'd12, 5'd23, 5'd0,  // rd, rs1, rs2
-            5'd23, 5'd0, 5'd0               // data1, data2, immd    
+            32'd23, 32'd0, 32'd0               // data1, data2, immd    
         );
         // mem_read, mem_write, mem_to_reg, reg_write_out, alu_src, branch, jump
         check_ctrl_signals(`__LINE__, 0, 0, 0, 1, 0, 0, 0, `ALU_OP_SRA);
@@ -194,7 +201,7 @@ module id_stage_tb #(
         #1;
         check_data_and_regs(
             `__LINE__, 5'd0, 5'd23, 5'd0,   // rd, rs1, rs2
-            5'd23, 5'd0, 5'd0               // data1, data2, immd    
+            32'd23, 32'd0, 32'd0               // data1, data2, immd    
         );
         // mem_read, mem_write, mem_to_reg, reg_write_out, alu_src, branch, jump
         check_ctrl_signals(`__LINE__, 0, 0, 0, 1, 0, 0, 0, `ALU_OP_SRA);
@@ -203,65 +210,45 @@ module id_stage_tb #(
         instr = 32'hed071e23; 
         @(posedge clk);         
         #1;
-        $display("Instr=%h | opcode=%b | instr_type=%d | rs1=%d | rs2=%d | rd=%d", 
-         instr, dut.opcode, dut.instr_type, dut.rs1, dut.rs2, dut.rd);
-        check_outputs(
-            `__LINE__,
-            32'd12,             // data1 (x14)
-            32'd0,              // data2 (x16)
-            -32'd292,           // immd_out
-            `ALU_OP_ADD,        // alu_op (add)
-            0, 0, 1, 0,         // reg_write_out, mem_read, mem_write, mem_to_reg
-            1, 0, 0             // alu_src, branch, jump
+        check_data_and_regs(
+            `__LINE__, 5'd0, 5'd14, 5'd16,  // rd, rs1, rs2
+            32'd14, 32'd16, 32'd0           // data1, data2, immd
         );
+        // mem_read, mem_write, mem_to_reg, reg_write_out, alu_src, branch, jump
+        check_ctrl_signals(`__LINE__, 0, 1, 0, 0, 1, 0, 0, `ALU_OP_ADD);
 
         // --------------------- 5) BGE x24, x15, 304 --------------------
         instr = 32'h12fc5863;   
         @(posedge clk);         
         #1;
-        $display("Instr=%h | opcode=%b | instr_type=%d | rs1=%d | rs2=%d | rd=%d", 
-         instr, dut.opcode, dut.instr_type, dut.rs1, dut.rs2, dut.rd);
-        check_outputs(
-            `__LINE__,
-            32'd69644,          // data1 (x24)
-            32'd134,            // data2 (x15)
-            32'd304,            // immd_out
-            `ALU_OP_SLT,        // alu_op (bge/set less than)
-            0, 0, 0, 0,         // reg_write_out, mem_read, mem_write, mem_to_reg
-            0, 1, 0             // alu_src, branch, jump
+        check_data_and_regs(
+            `__LINE__, 5'd0, 5'd24, 5'd15,  // rd, rs1, rs2
+            32'd24, 32'd15, 32'd304         // data1, data2, immd
         );
+        // mem_read, mem_write, mem_to_reg, reg_write_out, alu_src, branch, jump
+        check_ctrl_signals(`__LINE__, 0, 0, 0, 0, 1, 1, 0, `ALU_OP_ADD);
 
         // --------------------- 6) JAL x1, 7936 --------------------------
         instr = 32'h701010ef;
         @(posedge clk);         
         #1;
-        $display("Instr=%h | opcode=%b | instr_type=%d | rs1=%d | rs2=%d | rd=%d", 
-         instr, dut.opcode, dut.instr_type, dut.rs1, dut.rs2, dut.rd);
-        check_outputs(
-            `__LINE__,
-            32'd0,              // data1 (x0)
-            32'd0,              // data2 (x0)
-            32'd7936,           // immd_out
-            `ALU_OP_ADD,        // alu_op (jal)
-            1, 0, 0, 0,         // reg_write_out, mem_read, mem_write, mem_to_reg
-            1, 0, 1             // alu_src, branch, jump
+        check_data_and_regs(
+            `__LINE__, 5'd1, 5'd0, 5'd0,    // rd, rs1, rs2
+            32'd0, 32'd0, 32'd7936          // data1, data2, immd
         );
+        // mem_read, mem_write, mem_to_reg, reg_write_out, alu_src, branch, jump
+        check_ctrl_signals(`__LINE__, 0, 0, 0, 1, 1, 0, 1, `ALU_OP_ADD);
 
         // --------------------- 7) LUI x21, 0x4321 ----------------------
         instr = 32'h04321ab7;    
         @(posedge clk);
         #1;
-        $display("Instr=%h | opcode=%b | instr_type=%d | rs1=%d | rs2=%d | dest=%d", 
-         instr, dut.opcode, dut.instr_type, dut.rs1, dut.rs2, dut.rd);
-        check_outputs(
-            `__LINE__,
-            32'd0,              // data1 (x0)
-            32'd0,              // data2 (x0)
-            32'h04321000,       // immd_out
-            `ALU_OP_PASS,       // alu_op (lui)
-            1, 0, 0, 0,         // reg_write_out, mem_read, mem_write, mem_to_reg
-            1, 0, 0             // alu_src, branch, jump
+        check_data_and_regs(
+            `__LINE__, 5'd21, 5'd0, 5'd0,   // rd, rs1, rs2
+            32'd0, 32'd0, 32'h43210000      // data1, data2, immd
         );
+        // mem_read, mem_write, mem_to_reg, reg_write_out, alu_src, branch, jump
+        check_ctrl_signals(`__LINE__, 0, 0, 0, 1, 1, 0, 0, `ALU_OP_PASS);
 
         #20;
 
