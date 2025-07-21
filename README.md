@@ -21,7 +21,7 @@ For simulation, programs can be ran/added by generating the .mem file and then m
 
 ## Current status:
 
-- ID stage should be complete and starting to testbench.
+- ID stage has been completed and testbenched.
 - Instruction decoder has been completed and testbenched.
 - Immediate generator has been completed and testbenched.
 - Register file design has been completed and testbenched.
@@ -37,6 +37,6 @@ For simulation, programs can be ran/added by generating the .mem file and then m
 - Out of order execution
 - GShare branch prediction
 - UART instruction injection to enable co-processor support for an STM32 Nucleo board/custom PCB
-- Tiny GPU add on/custom instructions
+- Tiny GPU add on/custom instructions (You could reformat I-type instructions to do a parallel operations on a series of registers, storing the values into a "parllel regfile" which you could then use to forward/writeback to the regfile/pipeline stages. It would be pretty cool, I think it's possible?).
 - VonNeumann architecture with 1R/1RW memory
 - More advanced ALU (Dadda multiplier)

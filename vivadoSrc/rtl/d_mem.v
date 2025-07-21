@@ -36,7 +36,7 @@ module d_mem #(
     // Data port (Port B)
     input                               b_en_write,     // Keep names to change to true dual port one day
     input                               b_en_read,
-    input [WORD_SIZE - 1 : 0]           b_addr,
+    input [ADDR_SIZE - 1 : 0]           b_addr,
     input [WORD_SIZE - 1 : 0]           b_din,
     input [1:0]                         b_size,         // 00 = byte, 01 = half, 10 = word
     input                               b_unsigned,     // 0 = signed, 1 = unsigned

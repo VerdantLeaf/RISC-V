@@ -25,7 +25,7 @@ module id_stage #(
 
     WORD_SIZE = 32,
     NUM_REGS = 32,
-    REG_SEL = 5,
+    REG_SEL = $clog2(NUM_REGS),
     ADDR_SIZE = 10
 
     )(

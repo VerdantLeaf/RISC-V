@@ -19,82 +19,94 @@
 // 
 //////////////////////////////////////////////////////////////////////////////////
 
+`include "defines.vh"
 
 module id_ex_reg #(
     
     WORD_SIZE = 32,
-    NUM_REGS = 32
+    NUM_REGS = 32,
+    REG_SEL = $clog2(NUM_REGS),
+    ADDR_SIZE = 10
 
     )(
     input clk,
     input rst,
-    // Data
-    input [WORD_SIZE - 1:0] pc,            // PC needed for branch/jump target
-    input [WORD_SIZE - 1:0] rdata1,        // register file data
-    input [WORD_SIZE - 1:0] rdata2,
-    input [WORD_SIZE - 1:0] immd,
 
-    // func 3?? other info? - This is a large register
+    // ============================= INPUTS =========================
+    input [ADDR_SIZE - 1 : 0] pc,
 
+    input [WORD_SIZE - 1 : 0] immd,
+    input [WORD_SIZE - 1 : 0] data1,
+    input [WORD_SIZE - 1 : 0] data2,
+    input [3:0] alu_op,
+    input [REG_SEL - 1 : 0] rd,  
+    input [REG_SEL - 1 : 0] rs1, 
+    input [REG_SEL - 1 : 0] rs2,  
+
+    input mem_read,     
+    input mem_write,    
+    input mem_to_reg,   
+    input reg_write,
+
+    input alu_src,      
+    input branch,       
+    input jump,         
+
+    // =========================== OUTPUTS ==========================
     output reg [WORD_SIZE - 1:0] pc_out,
-    output reg [WORD_SIZE - 1:0] rdata1_out,
-    output reg [WORD_SIZE - 1:0] rdata2_out,
+
+    output reg [WORD_SIZE - 1:0] data1_out,
+    output reg [WORD_SIZE - 1:0] data2_out,
     output reg [WORD_SIZE - 1:0] immd_out,
+    output reg [3:0] alu_op_out,
+    output reg [REG_SEL - 1:0] rs1_out,
+    output reg [REG_SEL - 1:0] rs2_out,
+    output reg [REG_SEL - 1:0] rd_out,
 
-    // Ctrl signals
-    input [$clog2(NUM_REGS) - 1:0] sel_dest_reg,   // Select register to write to
-    input en_write_reg,         // Enable writing to register
-    input en_mem_read,          // Enable mem read
-    input en_mem_write,         // Enable mem write
-    input sel_alu_op,           // Select alu operation
-    input sel_alu_src,          // Select alu source for second arg
-    input sel_write_src,        // Select write from data memory or ALU result
-    input branch,
-    input jump,    
+    output reg mem_read_out,
+    output reg mem_write_out,
+    output reg mem_to_reg_out,
+    output reg reg_write_out,
 
-    output reg [$clog2(NUM_REGS) - 1:0] sel_dest_reg_out,
-    output reg en_write_reg_out,
-    output reg en_mem_read_out,
-    output reg en_mem_write_out,
-    output reg sel_alu_op_out,
-    output reg sel_alu_src_out,
-    output reg sel_write_src_out,
+    output reg alu_src_out,
     output reg branch_out,
     output reg jump_out
 
     );
 
-    always @(posedge clk or posedge rst)
+    always @(posedge clk or posedge rst) begin
         if (rst) begin
             pc_out <= {WORD_SIZE{1'b0}};
-            rdata1_out <= {WORD_SIZE{1'b0}};
-            rdata2_out <= {WORD_SIZE{1'b0}};
+            data1_out <= {WORD_SIZE{1'b0}};
+            data2_out <= {WORD_SIZE{1'b0}};
             immd_out <= {WORD_SIZE{1'b0}};
-            
-            sel_dest_reg_out <= {$clog2(NUM_REGS){1'b0}};
-            en_write_reg_out <= 0;
-            en_mem_read_out <= 0;
-            en_mem_write_out <= 0;
-            sel_alu_op_out <= 0;
-            sel_alu_src_out <= 0;
-            sel_write_src_out <= 0;
-            branch_out <= 0;
-            jump_out <= 0;
+            rd_out <= {REG_SEL{1'b0}};
+
+            alu_op_out <= `ALU_OP_ADD; // ADD is all zeros + allows easy insert for NOP
+            mem_read_out <= 1'b0;
+            mem_write_out <= 1'b0;
+            mem_to_reg_out <= 1'b0;
+            reg_write_out <= 1'b0;
+
+            alu_src_out <= 1'b1; // Set to 1 since default op is NOP. Can reset register to insert NOP into pipeline
+            branch_out <= 1'b0;
+            jump_out <= 1'b0;
+    
         end else begin
             pc_out <= pc;
-            rdata1_out <= rdata1;
-            rdata2_out <= rdata2;
+            data1_out <= data1;
+            data2_out <= data2;
             immd_out <= immd;
-            
-            sel_dest_reg_out <= sel_dest_reg;
-            en_write_reg_out <= en_write_reg;
-            en_mem_read_out <= en_mem_read;
-            en_mem_write_out <= en_mem_write;
-            sel_alu_op_out <= sel_alu_op;
-            sel_alu_src_out <= sel_alu_src;
-            sel_write_src_out <= sel_write_src;
+            rd_out <= rd;
+            alu_op_out <= alu_op;
+            mem_read_out <= mem_read;
+            mem_write_out <= mem_write;
+            mem_to_reg_out <= mem_to_reg;
+            reg_write_out <= reg_write;
+            alu_src_out <= alu_src;
             branch_out <= branch;
             jump_out <= jump;
-        end
 
+        end
+    end
 endmodule
