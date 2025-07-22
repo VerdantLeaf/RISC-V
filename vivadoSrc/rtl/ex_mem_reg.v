@@ -34,11 +34,10 @@ module ex_mem_reg #(
     input flush,
     input stall,
 
-
     input [ADDR_SIZE - 1 : 0] branch_target,    // PC of branch target
     input [WORD_SIZE - 1 : 0] alu_result,       // The result of the ALU operation
     input [WORD_SIZE - 1 : 0] write_data,       // Data written to memory
-    input [REG_SEL - 1 : 0] rd,   // Select register to write to
+    input [REG_SEL - 1 : 0] rd, // Select register to write to
 
     input alu_zero,             // is alu result zero (if it is, we branch)
     input branch,               // is instruction a branch instruction
@@ -46,8 +45,10 @@ module ex_mem_reg #(
     input mem_read,             // enable mem read
     input mem_write,            // enable mem write
     input reg_write,            // enable write back for memory
-    
 
+    input data_sign,            // Says if the data is signed or not
+    input [1:0] data_size,      // Tells the size of the data 00->byte, 01->halfword, 10->word
+    
     output [ADDR_SIZE - 1 : 0] branch_target_out,    
     output [WORD_SIZE - 1 : 0] alu_result_out,       
     output [WORD_SIZE - 1 : 0] write_data_out,       
@@ -58,7 +59,10 @@ module ex_mem_reg #(
     output jump_out,            
     output mem_read_out,             
     output mem_write_out,            
-    output reg_write_out            
+    output reg_write_out,
+
+    output data_sign_out,
+    output [1:0] data_size_out
 
     );
     
@@ -75,6 +79,10 @@ module ex_mem_reg #(
             mem_read_out <= 1'b0;
             mem_write_out <= 1'b0;
             reg_write_out <= 1'b0;
+
+            data_sign_out <= 1'b0;
+            data_size_out <= 2'b00;
+            
         end else if(!stall) begin
             branch_target_out <= branch_target;
             alu_result_out <= alu_result;
@@ -87,6 +95,9 @@ module ex_mem_reg #(
             mem_read_out <= mem_read;
             mem_write_out <= mem_write;
             reg_write_out <= reg_write;
+
+            data_sign_out <= data_sign;
+            data_size_out <= data_size;
         end
     end
 endmodule

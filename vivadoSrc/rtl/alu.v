@@ -30,19 +30,25 @@ module alu #(
     input clk,
     input rst,
 
-    input [2:0] alu_op,
+    input [3:0] alu_op,
     input [WORD_SIZE - 1 : 0] arg1,
     input [WORD_SIZE - 1 : 0] arg2,
 
     output [WORD_SIZE - 1 : 0] result,
-    output zero,
-    output pos
+    output zero
     );
 
     // Don't worry about for the moment
     // // ALU operations: and, or, xor, shift L, shift R, add, sub
-    // localparam op_and = 3'd0, op_or = 3'd1, op_xor = 3'd2, op_shift_L = 3'd3;
-    // localparam op_shift_R = 3'd4, op_add = 3'd5, op_sub = 3'd6;
+
+    // BEQ/BNE -> Do subtraction of A - B
+    // BLT/BGE -> Do signed compare and output 1 if A < B, 0 else
+    // BLTU/BGEU -> Do unsigned compare and output 1 if A < B, 0 else
+    // Double check this output
+
+
+
+
 
     // always @(posedge clk) begin
         

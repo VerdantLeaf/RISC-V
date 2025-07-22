@@ -102,6 +102,16 @@ module ex_stage #(
         .out(alu2)
     );
 
+    alu cpu_alu(
+        .clk(clk),
+        .rst(rst),
+        .alu_op(alu_op),
+        .arg1(data1),
+        .arg2(data2),
+        .result(result),
+        .zero(zero)
+    );
+
     // Need: Adder, shift left 1 for branching and ALU control
 
 

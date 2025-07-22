@@ -19,8 +19,9 @@
 // 
 //////////////////////////////////////////////////////////////////////////////////
 
-
+/// @brief handles all control hazards/other stalls, like branches/jumps
 module control_unit(
 
     );
+
 endmodule

@@ -19,9 +19,37 @@
 // 
 //////////////////////////////////////////////////////////////////////////////////
 
-
+/// @brief RV32I core that encapsulates all components of CPU
 module cpu_core(
     input clk,
     input rst
     );
+
+    // Pipeline registers and stages
+    if_stage instructionfetch();
+
+    if_id_reg IFID_register();
+
+    id_stage instructiondecode();
+
+    id_ex_reg IDEX_register();
+
+    ex_stage execution();
+
+    ex_mem_reg EXMEM_register();
+
+    mem_stage memory();
+
+    mem_wb_reg MEMWB_register();
+
+    wb_stage writeback();
+
+    // External control and hazard units
+    forwarding_unit forwarder();
+
+    hazard_unit hazard_unit();
+
+    
+
+
 endmodule

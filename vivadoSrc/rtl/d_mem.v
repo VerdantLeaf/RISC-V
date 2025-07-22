@@ -20,9 +20,11 @@
 //////////////////////////////////////////////////////////////////////////////////
 
 module d_mem #(
-    parameter NUM_WORDS = 1024,
-    parameter WORD_SIZE = 32,
-    parameter ADDR_SIZE = 10
+
+    NUM_WORDS = 1024,
+    WORD_SIZE = 32,
+    ADDR_SIZE = 10
+    
     )(
     // Note: need to understand and document read/write to same address collision behavior
 
@@ -67,15 +69,14 @@ module d_mem #(
     // PORT A READ
     // -----------------
     always @(posedge clk) begin             
-            a_dout = memory[a_index];   
+        a_dout = memory[a_index];   
     end
     
     // -----------------
     // PORT B READ/WRITE
     // -----------------
     always @(posedge clk) begin             // if a read or a write, grab the word at the index of the memory
-        if(b_en_write || b_en_read)         
-            b_mem_word = memory[a_index];   
+        if(b_en_write || b_en_read) b_mem_word = memory[a_index];   
     end
     
     // Data read port

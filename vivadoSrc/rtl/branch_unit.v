@@ -19,7 +19,7 @@
 // 
 //////////////////////////////////////////////////////////////////////////////////
 
-
+/// @brief Place holder for more complex branch prediciton in the future
 module branch_unit(
 
     );

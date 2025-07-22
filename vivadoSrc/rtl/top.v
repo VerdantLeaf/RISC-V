@@ -1,7 +1,7 @@
 `timescale 1ns / 1ps
 //////////////////////////////////////////////////////////////////////////////////
-// Company: 
-// Engineer: 
+// Company: myself
+// Engineer: kyle
 // 
 // Create Date: 05/17/2025 10:55:15 PM
 // Design Name: 
@@ -19,8 +19,11 @@
 // 
 //////////////////////////////////////////////////////////////////////////////////
 
-
+/// @brief Connects cpu_core to external I/O and interactable elements
 module top(
 
     );
+
+
+
 endmodule
