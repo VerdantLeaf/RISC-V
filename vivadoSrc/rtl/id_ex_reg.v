@@ -31,6 +31,8 @@ module id_ex_reg #(
     )(
     input clk,
     input rst,
+    input flush,
+    input stall,
 
     // ============================= INPUTS =========================
     input [ADDR_SIZE - 1 : 0] pc,
@@ -75,7 +77,7 @@ module id_ex_reg #(
     );
 
     always @(posedge clk or posedge rst) begin
-        if (rst) begin
+        if (rst || flush) begin
             pc_out <= {WORD_SIZE{1'b0}};
             data1_out <= {WORD_SIZE{1'b0}};
             data2_out <= {WORD_SIZE{1'b0}};
@@ -92,7 +94,7 @@ module id_ex_reg #(
             branch_out <= 1'b0;
             jump_out <= 1'b0;
     
-        end else begin
+        end else if (!stall) begin
             pc_out <= pc;
             data1_out <= data1;
             data2_out <= data2;

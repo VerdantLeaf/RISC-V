@@ -31,6 +31,8 @@ module mem_wb_reg #(
 
     input clk,
     input rst,
+    input flush,
+    input stall,
 
     input [WORD_SIZE - 1 : 0] read_data,
     input [WORD_SIZE - 1 : 0] result,
@@ -49,14 +51,14 @@ module mem_wb_reg #(
     );
 
     always @(posedge clk or posedge rst) begin
-        if(rst) begin
+        if(rst || flush) begin
             read_data_out <= {WORD_SIZE{1'b0}};
             result_out <= {WORD_SIZE{1'b0}};
             rd_out <= {REG_SEL{1'b0}};
             mem_read_out <= 1'b0;
             reg_write_out <= 1'b0;
 
-        end else begin
+        end else if (!stall) begin
             read_data_out <= read_data;
             result_out <= result;
             rd_out <= rd;

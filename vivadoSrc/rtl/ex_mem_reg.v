@@ -31,6 +31,9 @@ module ex_mem_reg #(
  
     input clk,
     input rst,
+    input flush,
+    input stall,
+
 
     input [ADDR_SIZE - 1 : 0] branch_target,    // PC of branch target
     input [WORD_SIZE - 1 : 0] alu_result,       // The result of the ALU operation
@@ -60,7 +63,7 @@ module ex_mem_reg #(
     );
     
     always @(posedge clk or posedge rst) begin
-        if (rst) begin
+        if (rst || flush) begin
             branch_target_out <= {ADDR_SIZE{1'b0}};
             alu_result_out <= {WORD_SIZE{1'b0}};
             write_data_out <= {WORD_SIZE{1'b0}};
@@ -72,7 +75,7 @@ module ex_mem_reg #(
             mem_read_out <= 1'b0;
             mem_write_out <= 1'b0;
             reg_write_out <= 1'b0;
-        end else begin
+        end else if(!stall) begin
             branch_target_out <= branch_target;
             alu_result_out <= alu_result;
             write_data_out <= write_data;
