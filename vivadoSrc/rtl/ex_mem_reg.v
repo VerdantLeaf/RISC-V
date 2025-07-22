@@ -39,7 +39,7 @@ module ex_mem_reg #(
 
     input alu_zero,             // is alu result zero (if it is, we branch)
     input branch,               // is instruction a branch instruction
-    input jump                  // is instruction a jump instruction
+    input jump,                 // is instruction a jump instruction
     input mem_read,             // enable mem read
     input mem_write,            // enable mem write
     input reg_write,            // enable write back for memory
