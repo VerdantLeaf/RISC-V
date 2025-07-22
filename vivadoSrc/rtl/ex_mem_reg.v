@@ -20,7 +20,14 @@
 //////////////////////////////////////////////////////////////////////////////////
 
 
-module ex_mem_reg(
+module ex_mem_reg #(
+
+    WORD_SIZE = 32,
+    NUM_REGS = 32,
+    REG_SEL = $clog2(NUM_REGS),
+    ADDR_SIZE = 10
+
+    )(
  
     input clk,
     input rst,
@@ -36,8 +43,8 @@ module ex_mem_reg(
     input alu_pos,                  // is alu result pos (if not pos and not zero, then neg)
     
     input branch,                   // is operation a branch operation
-    input en_mem_read,              // enable mem read
-    input en_mem_write,             // enable mem write
+    input mem_read,                 // enable mem read
+    input mem_write,                // enable mem write
     input write_source              // Select write from data memory or ALU result
     
     );

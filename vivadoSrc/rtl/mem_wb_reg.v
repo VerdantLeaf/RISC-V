@@ -18,3 +18,51 @@
 // Additional Comments:
 // 
 //////////////////////////////////////////////////////////////////////////////////
+
+
+module mem_wb_reg #(
+
+    WORD_SIZE = 32,
+    NUM_REGS = 32,
+    REG_SEL = $clog2(NUM_REGS),
+    ADDR_SIZE = 10
+
+    )(
+
+    input clk,
+    input rst,
+
+    input [WORD_SIZE - 1 : 0] read_data,
+    input [WORD_SIZE - 1 : 0] result,
+    input [REG_SEL - 1 : 0] rd,
+
+    input mem_read,
+    input reg_write,
+
+    output [WORD_SIZE - 1 : 0] read_data_out,
+    output [WORD_SIZE - 1 : 0] result_out,
+    output [REG_SEL - 1 : 0] rd_out,
+
+    output mem_read_out,
+    output reg_write_out
+
+    );
+
+    always @(posedge clk or posedge rst) begin
+        if(rst) begin
+            read_data_out <= {WORD_SIZE{1'b0}};
+            result_out <= {WORD_SIZE{1'b0}};
+            rd_out <= {REG_SEL{1'b0}};
+            mem_read_out <= 1'b0;
+            reg_write_out <= 1'b0;
+
+        end else begin
+            read_data_out <= read_data;
+            result_out <= result;
+            rd_out <= rd;
+            mem_read_out <= mem_read;
+            reg_write_out <= reg_write;
+        end
+    end
+
+endmodule
