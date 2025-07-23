@@ -41,6 +41,14 @@ module branch_unit #(
 
     );
 
-    assign pc_src = jump || (branch && zero); // src pc
+    // In the future, this can be much more complicated, but for now, I just need it
+    // to flush the instructions in the pipeline when we resolve that we're jumping/branching
+    always @(*) begin
+        if(jump || (branch && zero))  begin
+            
+        end else begin
+            
+        end
+    end
 
 endmodule

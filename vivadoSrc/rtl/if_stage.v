@@ -28,19 +28,20 @@ module if_stage #(
     )(
     input clk,
     input rst,
-    // data 
-    input [ADDR_SIZE - 1 : 0] pc_branch,
-    output [WORD_SIZE - 1:0] instr,
+
+    input [ADDR_SIZE - 1 : 0] branch_target,
     inout [ADDR_SIZE - 1 : 0] pc_next,
-    // ctrl signals
-    input pcsrc,
+
+    input pc_src,
     input en // Use for stall cycles on hazard resolution?
+
+    output [WORD_SIZE - 1:0] instr,
     );
 
     wire [ADDR_SIZE - 1 : 0] addr;
     wire [ADDR_SIZE - 1 : 0] pc_in;
 
-    assign pc_in = (pcsrc) ? pc_branch : pc_next;
+    assign pc_in = (pc_src) ? branch_target : pc_next;
 
     assign pc_next = addr + 4; // Future: Check for PC overflow
 

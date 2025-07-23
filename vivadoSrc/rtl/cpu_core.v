@@ -20,17 +20,86 @@
 //////////////////////////////////////////////////////////////////////////////////
 
 /// @brief RV32I core that encapsulates all components of CPU
-module cpu_core(
+module cpu_core #(
+
+    WORD_SIZE = 32,
+    NUM_REGS = 32,
+    REG_SEL = $clog2(NUM_REGS),
+    ADDR_SIZE = 10
+
+    )(
+
     input clk,
     input rst
     );
 
+    wire pc_src, en_pc_reg;
+    wire flush_ifid, flush_idex, flush_exmem, flush_memwb;
+    wire stall_ifid, stall_idex, stall_exmem, stall_memwb;
+
+
+    wire [ADDR_SIZE - 1 : 0] branch_target;
+    wire [ADDR_SIZE - 1 : 0] pc_next, pc_id, pc_ex, pc_mem, pc_wb;
+    wire [WORD_SIZE - 1 : 0] instr_if, instr_id;
+
+    // write back
+    wire reg_write_mem, reg_write_wb;
+    wire [WORD_SIZE - 1 : 0] write_data;
+    wire [REG_SEL - 1 : 0] write_select;
+
+
+    // control signals
+    wire mem_read;
+    wire mem_write;
+    wire mem_to_reg;
+    wire reg_write_out;
+    wire alu_src;
+    wire branch;
+    wire jump;
+
+
     // Pipeline registers and stages
-    if_stage instructionfetch();
+    if_stage instructionfetch(
+        .clk(clk),
+        .rst(rst),
+        
+        .pc_src(pc_src),
+        .en(en_pc_reg), // Enables updating of PC register. Sourced from branch unit?
+        
+        .branch_target(branch_target),
+        .pc_next(pc_next),
 
-    if_id_reg IFID_register();
+        .instr(instr_if)
+    );
 
-    id_stage instructiondecode();
+    if_id_reg IFID_register(
+        .clk(clk),
+        .rst(rst),
+
+        .flush(flush_ifid),
+        .stall(stall_ifid),
+
+        .instr(instr_if),
+        .pc(pc_next),
+
+        .instruction_out(instr_id), // instruction and PC to ID stage
+        .pc_out(pc_id)
+    );
+
+    id_stage instructiondecode(
+        .clk(clk),
+        .rst(rst),
+
+        .pc(pc_id),
+        .instr(instr_id),
+
+        .reg_write(reg_write_wb),
+        .rd_data(write_data),
+        .rd_select(write_select),
+
+        .pc_out(pc_ex),
+
+    );
 
     id_ex_reg IDEX_register();
 

@@ -31,10 +31,10 @@ module if_id_reg #(
     input flush,
     input stall,
 
-    input [WORD_SIZE - 1:0] instruction_in,
-    input [WORD_SIZE - 1:0] pc_in,
+    input [WORD_SIZE - 1:0] instr,
+    input [WORD_SIZE - 1:0] pc,
 
-    output reg [WORD_SIZE - 1:0] instruction_out,
+    output reg [WORD_SIZE - 1:0] instr_out,
     output reg [WORD_SIZE - 1:0] pc_out
     );
 
@@ -42,10 +42,10 @@ module if_id_reg #(
     always @(posedge clk or posedge rst) begin
         if(rst || flush) begin
             pc_out <= {WORD_SIZE{1'b0}};
-            instruction_out <= {WORD_SIZE{1'b0}};
+            instr_out <= {WORD_SIZE{1'b0}};
         end else if (!stall) begin
-            pc_out <= pc_in;
-            instruction_out <= instruction_in;
+            pc_out <= pc;
+            instr_out <= instr;
         end
     end
 

@@ -54,12 +54,18 @@ module mem_stage #(
 
     output [REG_SEL - 1 : 0] rd_out,
 
+    output branch_out,
+    output jump_out,
+    output zero_out
 
     );
 
 
     assign rd_out = rd;
     assign reg_write_out = reg_write;
+    assign branch_out = branch;
+    assign jump_out = jump;
+    assign zero_out = zero;
 
     d_mem datamemory(
         .clk(clk),
