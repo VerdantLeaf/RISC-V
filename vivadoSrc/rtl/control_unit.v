@@ -22,6 +22,9 @@
 /// @brief handles all control hazards/other stalls, like branches/jumps
 module control_unit(
 
+    // control unit for 5 stage pipeline is the instruction decoder. In the future,
+    // this becomes more complicated, and we'll add then.
+
     );
 
 endmodule

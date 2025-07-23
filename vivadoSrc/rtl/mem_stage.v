@@ -52,13 +52,11 @@ module mem_stage #(
     output [WORD_SIZE - 1 : 0] read_data,
     output [WORD_SIZE - 1 : 0] result_out,
 
-    output [REG_SEL - 1 : 0] rd_out
+    output [REG_SEL - 1 : 0] rd_out,
 
-    output pc_src
 
     );
 
-    assign pc_src = (branch && zero) || jump; // PC Src logic
 
     assign rd_out = rd;
     assign reg_write_out = reg_write;
@@ -75,6 +73,10 @@ module mem_stage #(
         .b_size(data_size),
         .b_unsigned(data_sign),
         .b_dout(read_data)
-    )
+    );
+
+    branch_unit branch_unit(
+
+    );
 
 endmodule

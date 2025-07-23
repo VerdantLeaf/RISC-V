@@ -23,7 +23,9 @@
 module top(
 
     );
+    // Set up different external I/o connectivity to ARTY board
 
+    cpu_core rv32i_core();
 
 
 endmodule

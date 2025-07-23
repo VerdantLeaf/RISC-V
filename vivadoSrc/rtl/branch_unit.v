@@ -20,7 +20,27 @@
 //////////////////////////////////////////////////////////////////////////////////
 
 /// @brief Place holder for more complex branch prediciton in the future
-module branch_unit(
+module branch_unit #(
+
+    WORD_SIZE = 32,
+    NUM_REGS = 32,
+    REG_SEL = $clog2(NUM_REGS)
+
+    )(
+
+    input branch,
+    input jump,
+    input zero,
+
+    output flush_ifid,
+    output flush_idex,
+    output flush_exmem,
+    output flush_memwb,
+
+    output pc_src
 
     );
+
+    assign pc_src = jump || (branch && zero); // src pc
+
 endmodule

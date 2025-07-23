@@ -53,6 +53,6 @@ module wb_stage #(
         .data({alu_data, memory_data}),
         .sel(mem_read),
         .out(write_Data)
-    )
+    );
     
 endmodule

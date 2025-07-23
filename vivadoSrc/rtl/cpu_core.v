@@ -49,7 +49,6 @@ module cpu_core(
 
     hazard_unit hazard_unit();
 
-    
-
+    branch_unit branch_unit();
 
 endmodule
