@@ -21,7 +21,6 @@
 
 `include "defines.vh"
 
-
 module immd_gen #(
 
     WORD_SIZE = 32

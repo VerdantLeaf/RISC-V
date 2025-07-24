@@ -48,8 +48,8 @@ module alu #(
             `ALU_OP_ADD:    result = A + B; // overflow bit in the future {overflow, result}
             `ALU_OP_SUB:    result = A - B;
             `ALU_OP_SLL:    result = A << B;
-            `ALU_OP_SLT:    result = (signed_A < signed_B) ? {WORD_SIZE{1'b1}} : {WORD_SIZE{1'b0}};
-            `ALU_OP_SLTU:   result = (A < B) ? {WORD_SIZE{1'b1}} : {WORD_SIZE{1'b0}};
+            `ALU_OP_SLT:    result = (signed_A < signed_B) ? {{(WORD_SIZE - 1){1'b0}}, 1'b1} : {WORD_SIZE{1'b0}};
+            `ALU_OP_SLTU:   result = (A < B) ? {{(WORD_SIZE - 1){1'b0}}, 1'b1} : {WORD_SIZE{1'b0}};
             `ALU_OP_XOR:    result = A ^ B;
             `ALU_OP_SRL:    result = A >> B;    // Logical shift
             `ALU_OP_SRA:    result = A >>> B;   // Arithmetic shift (does sign extend)
