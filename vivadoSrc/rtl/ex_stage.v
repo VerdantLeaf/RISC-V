@@ -29,9 +29,7 @@ module ex_stage #(
     ADDR_SIZE = 10
 
     )(
-    input clk,
-    input rst,
-
+        
     input [ADDR_SIZE - 1 : 0] pc,   // According to the RISC-V standard, this is the pc 
                                     // after the instruction in this stage of the pipeline
     input [WORD_SIZE - 1 : 0] data1,
@@ -57,7 +55,6 @@ module ex_stage #(
     input [1:0] data_size,
     input data_sign,
 
-    // Outputs of pass-throughs
     output [ADDR_SIZE - 1 : 0] branch_target,
 
     output [REG_SEL - 1 : 0] rs1_out, // pass-through to forwarding
@@ -65,8 +62,8 @@ module ex_stage #(
     output [REG_SEL - 1 : 0] rd_out,  // pass-through to MEM
 
     output [WORD_SIZE - 1 : 0] result, // also address for saving data
-    // data memory information 
-    output [WORD_SIZE - 1 : 0] save_data,
+    
+    output [WORD_SIZE - 1 : 0] save_data, // data to write to memory
     output [1 : 0] data_size, // 00 - byte, 01 = half-word, 10 = word
 
     output zero,    // If output of ALU is zero. Used for branching
@@ -118,8 +115,6 @@ module ex_stage #(
     );
 
     alu alu(
-        .clk(clk),
-        .rst(rst),
         .alu_op(alu_op),
         .arg1(data1),
         .arg2(data2),

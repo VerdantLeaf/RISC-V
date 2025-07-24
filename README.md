@@ -1,9 +1,8 @@
 # Status:
 
-ID Stage has been completed and the EX stage has begun. For this module, I am beginning by defining what I can already in the top level stage module. I think this will help with some issues I've been having with needing to modify old modules in order to make them fit because I forgot about something at the top level. I made full use of the tasks in the ID stage testbench, which were very useful. Secondly, I developed a fully generic multiplexer that can take any number of inputs at any length and select between them, outputing all zeros for selections that are not valid.
+EX stage testbench is nearly complete and ready for testing. ALU has been completed and testbenched. I went with a simple combinational/single-cycle ALU. For now, it is easier, since I am concerned about being able to deliver a working product by the end of the Summer. In the future, I have designed in the ability to stall the pipeline for a future more complicated ALU (bit pair or Dadda multiplier, multi-cycle, etc...). I've increased my use of tasks and how I am using them in my testbenches. Tasks are easily one of my favorite features.
 
-
-We are one step closer, and I am hopeful to have a completed and verified design. Regardless of that, I've learned a whole lot and have most certainly become a better hardware designer. I've done everything here myself, and while that may have slowed me down a little, compared to working in a professional seting, I've had to learn it *all*.
+We are one step closer, and I am hopeful to have a completed and verified design. Regardless of that, I've learned a whole lot and have most certainly become a better hardware designer. I've done everything here myself, and while that may have slowed me down a little, compared to working in a professional setting, I've had to learn it *all*.
 
 # RISC-V
 RISC-V implementation. Design and implementation of a 5-stage pipelines RV32I RISC-V processor in Verilog with a Harvard memory architecture. Utilizing the pipeline means developing each stage as well as units to handle the forwarding and branching. 
@@ -20,7 +19,7 @@ For simulation, programs can be ran/added by generating the .mem file and then m
 
 ## Current status:
 
-- EX stage high level design begun
+- EX stage design completed, waiting on testbench
 - IF and ID stages, as well as all submodules, are completed and testbenched
 - CPU defaults to 4KB of instruction memory
 - Data memory utilizes a 1R/1RW port setup to enable standard data memory for now, but Von Neumann memory in the future
@@ -32,6 +31,6 @@ For simulation, programs can be ran/added by generating the .mem file and then m
 - Out of order execution
 - GShare branch prediction - Or any branch prediction algorithm (I've done GShare in HDLBits)
 - UART instruction injection to enable co-processor support for an STM32 Nucleo board/custom PCB
-- Tiny GPU add on/custom instructions (You could reformat I-type instructions to do a parallel operations on a series of registers, storing the values into a "parllel regfile" which you could then use to forward/writeback to the regfile/pipeline stages. It would be pretty cool, I think it's possible?).
+- Tiny GPU add on/custom instructions (You could reformat I-type instructions to do a parallel operations on a series of registers, storing the values into a "parllel regfile" which you could then use to forward/writeback to the regfile/pipeline stages. It would be pretty cool, I think it's possible? (Learned about RISC-V vector instructions, which is cool)).
 - VonNeumann architecture with 1R/1RW memory
 - More advanced ALU (Dadda multiplier)
