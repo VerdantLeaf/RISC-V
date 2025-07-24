@@ -58,7 +58,10 @@ module id_stage #(
     output reg_write_out,                       // Instruction writes to regfile
     output alu_src,                             // Instruction uses immd or not
     output branch,                              // Instruction is branch
-    output jump                                 // Instruction is jump
+    output jump,                                // Instruction is jump
+
+    output [1:0] data_size,                     // Size of the data to load/save
+    output data_sign                            // Signedness of the data to load
     );
 
     // Pass through signals:
@@ -103,7 +106,9 @@ module id_stage #(
         .reg_write_out(reg_write_out),
         .alu_src(alu_src),
         .branch(branch),
-        .jump(jump)
+        .jump(jump),
+        .data_size(data_size),
+        .data_sign(data_sign)
     );
     
 endmodule

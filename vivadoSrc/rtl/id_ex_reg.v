@@ -54,6 +54,9 @@ module id_ex_reg #(
     input branch,       
     input jump,         
 
+    input [1:0] data_size,
+    input data_sign,
+
     // =========================== OUTPUTS ==========================
     output reg [WORD_SIZE - 1:0] pc_out,
 
@@ -72,7 +75,10 @@ module id_ex_reg #(
 
     output reg alu_src_out,
     output reg branch_out,
-    output reg jump_out
+    output reg jump_out,
+
+    output reg [1:0] data_size_out,
+    output reg data_sign_out
 
     );
 
@@ -93,6 +99,9 @@ module id_ex_reg #(
             alu_src_out <= 1'b1; // Set to 1 since default op is NOP. Can reset register to insert NOP into pipeline
             branch_out <= 1'b0;
             jump_out <= 1'b0;
+
+            data_sign_out <= 2'd0;
+            data_sign_out <= 1'b0;
     
         end else if (!stall) begin
             pc_out <= pc;
@@ -108,7 +117,8 @@ module id_ex_reg #(
             alu_src_out <= alu_src;
             branch_out <= branch;
             jump_out <= jump;
-
+            data_sign_out <= data_size;
+            data_sign_out <= data_sign;
         end
     end
 endmodule

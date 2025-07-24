@@ -66,7 +66,7 @@ module i_decoder #(
         alu_src       = 1'b1;
         branch        = 1'b0;
         jump          = 1'b0;
-        data_size     = 2'b0;
+        data_size     = 2'd0;
         data_sign     = 1'b0;
 
         case (opcode)

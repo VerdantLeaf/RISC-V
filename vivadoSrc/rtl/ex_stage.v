@@ -51,6 +51,9 @@ module ex_stage #(
 
     input alu_src,
 
+    input [1:0] data_size,
+    input data_sign,
+
     // Outputs of pass-throughs
     output [REG_SEL - 1 : 0] rs1_out, // pass-through to forwarding
     output [REG_SEL - 1 : 0] rs2_out, // ''
@@ -61,8 +64,10 @@ module ex_stage #(
     output [WORD_SIZE - 1 : 0] save_data,
     output [1 : 0] data_size, // 00 - byte, 01 = half-word, 10 = word
 
-    output pos,
-    output zero
+    output zero,    // If output of ALU is zero. Used for branching
+
+    output [1:0] data_size_out,
+    output data_sign_out
 
     );
 
@@ -74,6 +79,8 @@ module ex_stage #(
     assign rs1_out = rs1;
     assign rs2_out = rs2;
     assign rd_out  = rd;
+    assign data_size_out = data_size;
+    assign data_sign_out = data_sign;
 
     mux_gen #(
         .NUM_INPUTS(3),

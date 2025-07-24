@@ -46,8 +46,8 @@ module ex_mem_reg #(
     input mem_write,            // enable mem write
     input reg_write,            // enable write back for memory
 
-    input data_sign,            // Says if the data is signed or not
     input [1:0] data_size,      // Tells the size of the data 00->byte, 01->halfword, 10->word
+    input data_sign,            // Says if the data is signed or not
     
     output [ADDR_SIZE - 1 : 0] branch_target_out,    
     output [WORD_SIZE - 1 : 0] alu_result_out,       
