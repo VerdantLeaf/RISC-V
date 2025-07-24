@@ -51,17 +51,17 @@ module alu_tb #(
         
         begin
             if(e_result !== result) begin
-                $display("***RESULT FAIL @ line %0d***\nExp: %d\tGot: %d",
+                $display("RSLT FAIL @ line %0d\tExp: %d\tGot: %d",
                     line_num, e_result, result);
             end else begin
-                $display("***RESULT PASS @ line %0d***\n", line_num);
+                $display("RSLT PASS @ line %0d", line_num);
             end
 
             if(e_zero !== zero) begin
-                $display("***ZERO FAIL @ line %0d***\nExp: %d\tGot: %d",
+                $display("ZERO FAIL @ line %0d\tExp: %d\tGot: %d",
                     line_num, e_zero, zero);
             end else begin
-                $display("***ZERO PASS @ line %0d***\n", line_num);
+                $display("ZERO PASS @ line %0d", line_num);
             end
         end
     endtask
@@ -220,7 +220,7 @@ module alu_tb #(
 
         arg1 = 32'he05320;
         arg2 = 32'h335907;
-        alu_op = `ALU_OP_XOR       // (e05320 ^ 335907) = d30a27
+        alu_op = `ALU_OP_XOR;       // (e05320 ^ 335907) = d30a27
         #5;
         checkresults(`__LINE__, 32'hd30a27, 0);
         #1;
@@ -229,14 +229,14 @@ module alu_tb #(
 
         arg1 = 32'h0A0A0A0A;
         arg2 = 32'd12;
-        alu_op = `ALU_OP_SRA;       // 0x0A0A0A0A >> 12 = 0xa0a0
+        alu_op = `ALU_OP_SRL;       // 0x0A0A0A0A >> 12 = 0xa0a0
         #5;
         checkresults(`__LINE__, 32'ha0a0, 0);
         #1;
 
         arg1 = 32'h80123456;
         arg2 = 32'd20;
-        alu_op = `ALU_OP_SRA;       // 0x80123456 >> 20 = 0x00000801
+        alu_op = `ALU_OP_SRL;       // 0x80123456 >> 20 = 0x00000801
         #5;
         checkresults(`__LINE__, 32'h00000801, 0);
         #1;
@@ -251,10 +251,10 @@ module alu_tb #(
         #1;
 
         arg1 = 32'h80123456;
-        arg2 = 32'd20;
+        arg2 = 32'd20;              // $signed(32'h80123456) >>> 20
         alu_op = `ALU_OP_SRA;       // 0x80123456 >>> 20 = 0xFFFFF801
         #5;
-        checkresults(`__LINE__, 32'hFFFFF801, 0);
+        checkresults(`__LINE__, 32'hFFFFF801 , 0);
         #1;
 
         $display("*******Bitwise OR tests*******");
@@ -263,7 +263,7 @@ module alu_tb #(
         arg2 = 32'ha0a0a0a0;
         alu_op = `ALU_OP_OR;       // 0x0A0A0A0A | a0a0a0a0 = 0xAAAAAAAA
         #5;
-        checkresults(`__LINE__, 32'ha0a0, 0);
+        checkresults(`__LINE__, 32'hAAAAAAAA, 0);
         #1;
 
         arg1 = 32'hAAAAAAAA;
@@ -307,9 +307,9 @@ module alu_tb #(
 
         arg1 = 32'h0;
         arg2 = 32'd2340;
-        alu_op = `ALU_OP_SRA;       // see above
+        alu_op = `ALU_OP_PASS;       // see above
         #5;
-        checkresults(`__LINE__, 32'h2340, 0);
+        checkresults(`__LINE__, 32'd2340, 0);
         #1;
 
         $finish();
