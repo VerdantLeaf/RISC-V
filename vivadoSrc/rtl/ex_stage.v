@@ -25,12 +25,15 @@ module ex_stage #(
 
     WORD_SIZE = 32,
     NUM_REGS = 32,
-    REG_SEL = $clog2(NUM_REGS)
+    REG_SEL = $clog2(NUM_REGS),
+    ADDR_SIZE = 10
 
     )(
     input clk,
     input rst,
 
+    input [ADDR_SIZE - 1 : 0] pc,   // According to the RISC-V standard, this is the pc 
+                                    // after the instruction in this stage of the pipeline
     input [WORD_SIZE - 1 : 0] data1,
     input [WORD_SIZE - 1 : 0] wb_forward1,
     input [WORD_SIZE - 1 : 0] mem_forward1,
@@ -55,6 +58,8 @@ module ex_stage #(
     input data_sign,
 
     // Outputs of pass-throughs
+    output [ADDR_SIZE - 1 : 0] branch_target,
+
     output [REG_SEL - 1 : 0] rs1_out, // pass-through to forwarding
     output [REG_SEL - 1 : 0] rs2_out, // ''
     output [REG_SEL - 1 : 0] rd_out,  // pass-through to MEM
@@ -81,6 +86,9 @@ module ex_stage #(
     assign rd_out  = rd;
     assign data_size_out = data_size;
     assign data_sign_out = data_sign;
+
+    // Translate immd to bytes and add to pc to get branch target
+    assign branch_target = pc + (immd << 2);
 
     mux_gen #(
         .NUM_INPUTS(3),
@@ -109,7 +117,7 @@ module ex_stage #(
         .out(alu2)
     );
 
-    alu cpu_alu(
+    alu alu(
         .clk(clk),
         .rst(rst),
         .alu_op(alu_op),
@@ -118,9 +126,5 @@ module ex_stage #(
         .result(result),
         .zero(zero)
     );
-
-    // Need: Adder, shift left 1 for branching and ALU control
-
-
 
 endmodule
