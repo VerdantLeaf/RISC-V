@@ -42,7 +42,10 @@ module i_decoder #(
     output reg reg_write_out,
     output reg alu_src,
     output reg branch,
-    output reg jump
+    output reg jump,
+
+    output reg [1:0] data_size, // The size of the data 00-> byte, 01-> halfword, 10-> word
+    output ref data_sign        // 0-> signed, 1-> unsigned
 
     );
 
@@ -63,7 +66,8 @@ module i_decoder #(
         alu_src       = 1'b1;
         branch        = 1'b0;
         jump          = 1'b0;
-
+        data_size     = 2'b0;
+        data_sign     = 1'b0;
 
         case (opcode)
             // -----------------------------
@@ -119,6 +123,9 @@ module i_decoder #(
                 mem_read      = 1'b1;
                 mem_to_reg    = 1'b1;
                 reg_write_out = (instr[11:7] != 5'd0);
+
+                data_size = func3[1:0];
+                data_sign = func3[2];
             end
             // -----------------------------
             // S-TYPE - SAVE
@@ -129,6 +136,8 @@ module i_decoder #(
 
                 mem_write     = 1'b1;
                 alu_src       = 1'b1;
+
+                data_size = func3[1:0]; // Only need lower two bits, + encoding matches ISA
             end
             // -----------------------------
             // B-TYPE - BEQ, BLT, etc...

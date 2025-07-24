@@ -27,46 +27,39 @@ module alu #(
     WORD_SIZE = 32
 
     )(
-    input clk,
-    input rst,
-
     input [3:0] alu_op,
-    input [WORD_SIZE - 1 : 0] arg1,
-    input [WORD_SIZE - 1 : 0] arg2,
+    input [WORD_SIZE - 1 : 0] A, // rs1
+    input [WORD_SIZE - 1 : 0] B, // rs2 or immd
 
-    output [WORD_SIZE - 1 : 0] result,
+    output reg [WORD_SIZE - 1 : 0] result,
     output zero
     );
 
-    // Don't worry about for the moment
-    // // ALU operations: and, or, xor, shift L, shift R, add, sub
+    // We're keeping a simple execution unit, for now
+    // this is because I want to get the design up and running so that I can start
+    // to face the systems integration challenges. I am short on time this summer,
+    // for personal reasons, and so we're executing.
 
-    // BEQ/BNE -> Do subtraction of A - B
-    // BLT/BGE -> Do signed compare and output 1 if A < B, 0 else
-    // BLTU/BGEU -> Do unsigned compare and output 1 if A < B, 0 else
-    // Double check this output
+    wire signed [WORD_SIZE - 1 : 0] signed_A = $signed(A); // Create signed copies
+    wire signed [WORD_SIZE - 1 : 0] signed_B = $signed(B);
 
+    always @(*) begin
+        case (alu_op)
+            `ALU_OP_ADD:    result = A + B; // overflow bit in the future {overflow, result}
+            `ALU_OP_SUB:    result = A - B;
+            `ALU_OP_SLL:    result = A << B;
+            `ALU_OP_SLT:    result = (signed_A < signed_B) ? {WORD_SIZE{1'b1}} : {WORD_SIZE{1'b0}};
+            `ALU_OP_SLTU:   result = (A < B) ? {WORD_SIZE{1'b1}} : {WORD_SIZE{1'b0}};
+            `ALU_OP_XOR:    result = A ^ B;
+            `ALU_OP_SRL:    result = A >> B;    // Logical shift
+            `ALU_OP_SRA:    result = A >>> B;   // Arithmetic shift (does sign extend)
+            `ALU_OP_OR:     result = A | B;
+            `ALU_OP_AND:    result = A & B;
+            `ALU_OP_PASS:   result = B;
+            default:        result = {WORD_SIZE{1'b0}}; // In future have error flag?
+        endcase
+    end
 
-
-
-
-    // always @(posedge clk) begin
-        
-    //     if(rst)
-
-    //     else
-    //         case(alu_op)
-    //             op_and:
-    //             op_or:
-    //             op_xor:
-    //             op_shift_L:
-    //             op_shift_R:
-    //             op_add:
-    //             op_sub:
-    //         endcase
-        
-    // end
-
-
+    assign zero = (result == {WORD_SIZE{1'b0}}) ? 1 : 0; 
 
 endmodule
