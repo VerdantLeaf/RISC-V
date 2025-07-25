@@ -28,46 +28,32 @@ module ex_stage_tb #(
     REG_SEL = $clog2(NUM_REGS)
 
     )();
-    reg [ADDR_SIZE - 1 : 0] pc,
+    reg [ADDR_SIZE - 1 : 0] pc;
     
-    reg [WORD_SIZE - 1 : 0] data1,
-    reg [WORD_SIZE - 1 : 0] wb_forward1,
-    reg [WORD_SIZE - 1 : 0] mem_forward1,
+    reg [WORD_SIZE - 1 : 0] data1;
+    reg [WORD_SIZE - 1 : 0] wb_forward1;
+    reg [WORD_SIZE - 1 : 0] mem_forward1;
 
-    reg [WORD_SIZE - 1 : 0] data2,
-    reg [WORD_SIZE - 1 : 0] wb_forward2,
-    reg [WORD_SIZE - 1 : 0] mem_forward2,
+    reg [WORD_SIZE - 1 : 0] data2;
+    reg [WORD_SIZE - 1 : 0] wb_forward2;
+    reg [WORD_SIZE - 1 : 0] mem_forward2;
 
-    reg [REG_SEL - 1 : 0] rs1, 
-    reg [REG_SEL - 1 : 0] rs2, 
-    reg [REG_SEL - 1 : 0] rd,  
+    reg [WORD_SIZE - 1 : 0] immd;
 
-    reg [WORD_SIZE - 1 : 0] immd,
+    reg [1 : 0] sel_forward1;
+    reg [1 : 0] sel_forward2;
+    reg [3:0] alu_op;
 
-    reg [1 : 0] sel_forward1,
-    reg [1 : 0] sel_forward2,
-    reg [3:0] alu_op,
+    reg alu_src;
 
-    reg alu_src,
+    reg [1:0] data_size;
+    reg data_sign;
 
-    reg [1:0] data_size,
-    reg data_sign,
+    wire [ADDR_SIZE - 1 : 0] branch_target;
+    wire [WORD_SIZE - 1 : 0] result;
+    wire [WORD_SIZE - 1 : 0] write_data;
+    wire zero;
 
-    wire [ADDR_SIZE - 1 : 0] branch_target,
-
-    wire [REG_SEL - 1 : 0] rs1_out, 
-    wire [REG_SEL - 1 : 0] rs2_out, 
-    wire [REG_SEL - 1 : 0] rd_out,  
-
-    wire [WORD_SIZE - 1 : 0] result,
-    wire [WORD_SIZE - 1 : 0] save_data,
-    wire [1:0] data_size, 
-
-    wire zero,
-
-    wire [1:0] data_size_out,
-    wire data_sign_out 
-    
     ex_stage dut(
         .pc(pc),
 
@@ -92,19 +78,14 @@ module ex_stage_tb #(
         .zero(zero),
         .alu_src(alu_src),
 
+        .write_data(write_data),
         .data_size(data_size),
         .data_sign(data_sign),
 
         .branch_target(branch_target),
 
-        .rs1_out(rs1_out),
-        .rs2_out(rs2_out),
-        .rd_out(rd_out),
-        .result(result),
+        .result(result)
 
-        .save_data(save_data),
-        .data_size_out(data_size_out),
-        .data_sign_out(data_sign_out)
     );
 
     integer pass_count = 0, fail_count = 0;
@@ -156,14 +137,35 @@ module ex_stage_tb #(
         check_test(`__LINE__,
             10, 5, 0, 0, 0, 0,                  // td1, td2, twb1, tmem1, twb2, tmem2
             2'b00, 2'b00, `ALU_OP_ADD,          // t1sel, t2sel, alu_op
-            0, 0, 100,                          // talusrc, t_immmd, t_pc
+            0, 0, 100,                          // talusrc, t_immd, t_pc
+            1, 2, 3,                            // trs1, trs2, trd 
+            15, 100, 0);                        // eresult, e_branch_target, e_zero
+
+        check_test(`__LINE__,
+            1, 5, 0, 0, 0, 0,                  // td1, td2, twb1, tmem1, twb2, tmem2
+            2'b00, 2'b00, `ALU_OP_ADD,          // t1sel, t2sel, alu_op
+            0, 0, 100,                          // talusrc, t_immd, t_pc
             1, 2, 3,                            // trs1, trs2, trd 
             15, 100, 0);                        // eresult, e_branch_target, e_zero
 
         check_test(`__LINE__,
             10, 5, 0, 0, 0, 0,                  // td1, td2, twb1, tmem1, twb2, tmem2
             2'b00, 2'b00, `ALU_OP_ADD,          // t1sel, t2sel, alu_op
-            0, 0, 100,                          // talusrc, t_immmd, t_pc
+            0, 0, 100,                          // talusrc, t_immd, t_pc
+            1, 2, 3,                            // trs1, trs2, trd 
+            15, 100, 0);                        // eresult, e_branch_target, e_zero
+
+        check_test(`__LINE__,
+            10, 5, 0, 0, 0, 0,                  // td1, td2, twb1, tmem1, twb2, tmem2
+            2'b00, 2'b00, `ALU_OP_ADD,          // t1sel, t2sel, alu_op
+            0, 0, 100,                          // talusrc, t_immd, t_pc
+            1, 2, 3,                            // trs1, trs2, trd 
+            15, 100, 0);                        // eresult, e_branch_target, e_zero
+
+        check_test(`__LINE__,
+            10, 5, 0, 0, 0, 0,                  // td1, td2, twb1, tmem1, twb2, tmem2
+            2'b00, 2'b00, `ALU_OP_ADD,          // t1sel, t2sel, alu_op
+            0, 0, 100,                          // talusrc, t_immd, t_pc
             1, 2, 3,                            // trs1, trs2, trd 
             15, 100, 0);                        // eresult, e_branch_target, e_zero
 

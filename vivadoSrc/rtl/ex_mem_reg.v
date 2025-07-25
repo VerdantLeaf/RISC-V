@@ -36,8 +36,7 @@ module ex_mem_reg #(
 
     input [ADDR_SIZE - 1 : 0] branch_target,    // PC of branch target
     input [WORD_SIZE - 1 : 0] alu_result,       // The result of the ALU operation
-    input [WORD_SIZE - 1 : 0] write_data,       // Data written to memory
-    input [REG_SEL - 1 : 0] rd, // Select register to write to
+    input [REG_SEL - 1 : 0] rd,                 // Select register to write to
 
     input alu_zero,             // is alu result zero (if it is, we branch)
     input branch,               // is instruction a branch instruction
@@ -46,23 +45,24 @@ module ex_mem_reg #(
     input mem_write,            // enable mem write
     input reg_write,            // enable write back for memory
 
-    input [1:0] data_size,      // Tells the size of the data 00->byte, 01->halfword, 10->word
-    input data_sign,            // Says if the data is signed or not
+    input [WORD_SIZE - 1 : 0] write_data,   // Data written to memory
+    input [1:0] data_size,                  // Tells the size of the data 00->byte, 01->halfword, 10->word
+    input data_sign,                        // Says if the data is signed or not
     
-    output [ADDR_SIZE - 1 : 0] branch_target_out,    
-    output [WORD_SIZE - 1 : 0] alu_result_out,       
-    output [WORD_SIZE - 1 : 0] write_data_out,       
-    output [REG_SEL - 1 : 0] rd_out,  
+    output reg [ADDR_SIZE - 1 : 0] branch_target_out,    
+    output reg [WORD_SIZE - 1 : 0] alu_result_out,       
+    output reg [REG_SEL - 1 : 0] rd_out,  
 
-    output alu_zero_out,             
-    output branch_out,   
-    output jump_out,            
-    output mem_read_out,             
-    output mem_write_out,            
-    output reg_write_out,
+    output reg alu_zero_out,             
+    output reg branch_out,   
+    output reg jump_out,            
+    output reg mem_read_out,             
+    output reg mem_write_out,            
+    output reg reg_write_out,
 
-    output data_sign_out,
-    output [1:0] data_size_out
+    output reg [WORD_SIZE - 1 : 0] write_data_out,       
+    output reg data_sign_out,
+    output reg [1:0] data_size_out
 
     );
     

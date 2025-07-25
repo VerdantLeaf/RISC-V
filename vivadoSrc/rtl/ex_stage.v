@@ -40,49 +40,23 @@ module ex_stage #(
     input [WORD_SIZE - 1 : 0] wb_forward2,
     input [WORD_SIZE - 1 : 0] mem_forward2,
 
-    input [REG_SEL - 1 : 0] rs1, 
-    input [REG_SEL - 1 : 0] rs2, 
-    input [REG_SEL - 1 : 0] rd,  
-
     input [WORD_SIZE - 1 : 0] immd,
 
     input [1 : 0] sel_forward1,
     input [1 : 0] sel_forward2,
     input [3:0] alu_op,
-
     input alu_src,
 
-    input [1:0] data_size,
-    input data_sign,
-
-    output [ADDR_SIZE - 1 : 0] branch_target,
-
-    output [REG_SEL - 1 : 0] rs1_out, // pass-through to forwarding
-    output [REG_SEL - 1 : 0] rs2_out, // ''
-    output [REG_SEL - 1 : 0] rd_out,  // pass-through to MEM
-
-    output [WORD_SIZE - 1 : 0] result, // also address for saving data
-    
-    output [WORD_SIZE - 1 : 0] save_data, // data to write to memory
-    output [1 : 0] data_size, // 00 - byte, 01 = half-word, 10 = word
-
-    output zero,    // If output of ALU is zero. Used for branching
-
-    output [1:0] data_size_out,
-    output data_sign_out
+    output [ADDR_SIZE - 1 : 0] branch_target,   // addr of branch target
+    output [WORD_SIZE - 1 : 0] result,          // also address for saving data
+    output [WORD_SIZE - 1 : 0] write_data,      // data to write to memory
+    output zero    // If output of ALU is zero. Used for branching
 
     );
 
     wire [WORD_SIZE - 1 : 0] alu1, alu2, alu_src1;
 
-    assign save_data = alu_src2;
-
-    // Pass through selections
-    assign rs1_out = rs1;
-    assign rs2_out = rs2;
-    assign rd_out  = rd;
-    assign data_size_out = data_size;
-    assign data_sign_out = data_sign;
+    assign write_data = alu_src2;
 
     // Translate immd to bytes and add to pc to get branch target
     assign branch_target = pc + (immd << 2);

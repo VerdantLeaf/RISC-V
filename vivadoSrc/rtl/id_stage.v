@@ -32,17 +32,12 @@ module id_stage #(
     input clk, 
     input rst,
 
-    // Inputs are from the IF/ID pipeline register
-    input [ADDR_SIZE - 1 : 0] pc,               // PC of the instruction
-
     input [WORD_SIZE - 1 : 0] instr,            // Instruction to be decoded
 
     input reg_write,                            // Enable writing to the register file
     input [WORD_SIZE - 1 : 0] rd_data,          // Data to be written to the register file
     input [REG_SEL - 1 : 0] rd_select,          // The select bits for the write back
 
-    // Outputs should go to the ID/EX pipeline register
-    output [ADDR_SIZE - 1 : 0] pc_out,          // Output of PC pass-through
 
     output [WORD_SIZE - 1 : 0] immd,            // Immediate extracted from immediate decode
     output [WORD_SIZE - 1 : 0] data1,           // First data from the register file
@@ -63,9 +58,6 @@ module id_stage #(
     output [1:0] data_size,                     // Size of the data to load/save
     output data_sign                            // Signedness of the data to load
     );
-
-    // Pass through signals:
-    assign pc_out = pc;
 
     wire [REG_SEL - 1 : 0] rs1_sel;
     wire [REG_SEL - 1 : 0] rs2_sel;

@@ -33,16 +33,11 @@ module id_stage_tb #(
     reg clk;
     reg rst;
 
-    reg [ADDR_SIZE - 1:0] pc;
-
     reg [WORD_SIZE - 1:0] instr;
 
     reg reg_write;
     reg [WORD_SIZE - 1:0] rd_data;
     reg [REG_SEL - 1:0] rd_select;
-
-    wire [ADDR_SIZE - 1:0] pc_out;
-
 
     wire [WORD_SIZE - 1:0] immd;
     wire [WORD_SIZE - 1:0] data1;
@@ -64,15 +59,11 @@ module id_stage_tb #(
         .clk(clk),
         .rst(rst),
 
-        .pc(pc),
-
         .instr(instr),
 
         .reg_write(reg_write),
         .rd_data(rd_data),
         .rd_select(rd_select),
-
-        .pc_out(pc_out),
 
         .immd(immd),
         .data1(data1),
