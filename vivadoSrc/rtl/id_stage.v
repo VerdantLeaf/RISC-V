@@ -50,7 +50,7 @@ module id_stage #(
     output mem_read,                            // Instruction reads from memory
     output mem_write,                           // Instruction writes to memory
     output mem_to_reg,                          // Instruction writes to regfile from memory
-    output reg_write_out,                       // Instruction writes to regfile
+    output reg_write,                           // Instruction writes to regfile
     output alu_src,                             // Instruction uses immd or not
     output branch,                              // Instruction is branch
     output jump,                                // Instruction is jump
@@ -95,7 +95,7 @@ module id_stage #(
         .mem_read(mem_read),
         .mem_write(mem_write),
         .mem_to_reg(mem_to_reg),
-        .reg_write_out(reg_write_out),
+        .reg_write(reg_write),
         .alu_src(alu_src),
         .branch(branch),
         .jump(jump),

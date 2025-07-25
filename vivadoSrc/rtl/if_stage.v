@@ -33,7 +33,7 @@ module if_stage #(
     inout [ADDR_SIZE - 1 : 0] pc_next,
 
     input pc_src,
-    input en, // Use for stall cycles on hazard resolution?
+    input en, // Use for stall cycles on hazard resolution? (yes, get to that eventually)
 
     output [WORD_SIZE - 1:0] instr
     );

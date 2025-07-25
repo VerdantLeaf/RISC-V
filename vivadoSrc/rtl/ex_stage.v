@@ -41,16 +41,15 @@ module ex_stage #(
     input [WORD_SIZE - 1 : 0] mem_forward2,
 
     input [WORD_SIZE - 1 : 0] immd,
-
     input [1 : 0] sel_forward1,
     input [1 : 0] sel_forward2,
     input [3:0] alu_op,
     input alu_src,
+    output zero    // If output of ALU is zero. Used for branching
 
     output [ADDR_SIZE - 1 : 0] branch_target,   // addr of branch target
     output [WORD_SIZE - 1 : 0] result,          // also address for saving data
     output [WORD_SIZE - 1 : 0] write_data,      // data to write to memory
-    output zero    // If output of ALU is zero. Used for branching
 
     );
 

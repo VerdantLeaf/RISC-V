@@ -43,6 +43,7 @@ module ex_mem_reg #(
     input jump,                 // is instruction a jump instruction
     input mem_read,             // enable mem read
     input mem_write,            // enable mem write
+    input mem_to_reg,           // where should we read from
     input reg_write,            // enable write back for memory
 
     input [WORD_SIZE - 1 : 0] write_data,   // Data written to memory
@@ -58,6 +59,7 @@ module ex_mem_reg #(
     output reg jump_out,            
     output reg mem_read_out,             
     output reg mem_write_out,            
+    output reg mem_to_reg_out,
     output reg reg_write_out,
 
     output reg [WORD_SIZE - 1 : 0] write_data_out,       
@@ -77,6 +79,7 @@ module ex_mem_reg #(
             branch_out <= 1'b0;
             jump_out <= 1'b0;
             mem_read_out <= 1'b0;
+            mem_to_reg_out <= 1'b0;
             mem_write_out <= 1'b0;
             reg_write_out <= 1'b0;
 
@@ -93,6 +96,7 @@ module ex_mem_reg #(
             branch_out <= branch;
             jump_out <= jump;
             mem_read_out <= mem_read;
+            mem_to_reg_out <= mem_to_reg;
             mem_write_out <= mem_write;
             reg_write_out <= reg_write;
 

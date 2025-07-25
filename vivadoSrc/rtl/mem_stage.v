@@ -37,7 +37,6 @@ module mem_stage #(
 
     input [REG_SEL - 1 : 0] rd,
 
-    input reg_write,
     input mem_read,
     input mem_write,
     input branch,
@@ -47,25 +46,15 @@ module mem_stage #(
     input data_sign, // 0 for signed and 1 for unsigned
     input [1:0] data_size,
 
-    output reg_write_out,
-
     output [WORD_SIZE - 1 : 0] read_data,
-    output [WORD_SIZE - 1 : 0] result_out,
+    output pc_src,
 
-    output [REG_SEL - 1 : 0] rd_out,
-
-    output branch_out,
-    output jump_out,
-    output zero_out
+    output flush_ifid,
+    output flush_idex,
+    output flush_exmem,
+    output flush_memwb
 
     );
-
-
-    assign rd_out = rd;
-    assign reg_write_out = reg_write;
-    assign branch_out = branch;
-    assign jump_out = jump;
-    assign zero_out = zero;
 
     d_mem datamemory(
         .clk(clk),

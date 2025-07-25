@@ -39,13 +39,16 @@ module cpu_core #(
 
 
     wire [ADDR_SIZE - 1 : 0] branch_target;
-    wire [ADDR_SIZE - 1 : 0] pc_next, pc_id, pc_ex, pc_mem, pc_wb;
+    wire [ADDR_SIZE - 1 : 0] pc_next;
     wire [WORD_SIZE - 1 : 0] instr_if, instr_id;
 
     // write back
     wire reg_write_mem, reg_write_wb;
     wire [WORD_SIZE - 1 : 0] write_data;
     wire [REG_SEL - 1 : 0] write_select;
+
+    // immediates
+    wire [WORD_SIZE - 1 : 0] immd_id;
 
 
     // control signals
@@ -75,14 +78,13 @@ module cpu_core #(
     if_id_reg IFID_register(
         .clk(clk),
         .rst(rst),
-
         .flush(flush_ifid),
         .stall(stall_ifid),
 
         .instr(instr_if),
         .pc(pc_next),
 
-        .instruction_out(instr_id), // instruction and PC to ID stage
+        .instr_out(instr_id), // instruction and PC to ID stage
         .pc_out(pc_id)
     );
 
@@ -90,18 +92,40 @@ module cpu_core #(
         .clk(clk),
         .rst(rst),
 
-        .pc(pc_id),
         .instr(instr_id),
 
         .reg_write(reg_write_wb),
         .rd_data(write_data),
         .rd_select(write_select),
 
-        .pc_out(pc_ex),
+        .immd(immd_id),
+        .data1(),
+        .data2(),
+        .alu_op(),
+        .rd(),
+        .rs1(),
+        .rs2(),
 
+        .mem_read(),
+        .mem_write(),
+        .mem_to_reg(),
+        .reg_write(),
+        .alu_src(),
+        .branch(),
+        .jump(),
+
+        .data_size(),
+        .data_sign()
     );
 
-    id_ex_reg IDEX_register();
+    id_ex_reg IDEX_register(
+        .clk(clk),
+        .rst(rst),
+        .flush(flush_idex),
+        .stall(stall_idex),
+
+        .pc(pc_id)
+    );
 
     ex_stage execution();
 

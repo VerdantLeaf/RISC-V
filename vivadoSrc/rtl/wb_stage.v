@@ -30,28 +30,18 @@ module wb_stage #(
 
     input [WORD_SIZE - 1 : 0] memory_data,
     input [WORD_SIZE - 1 : 0] alu_data,
-    input [REG_SEL - 1 : 0] rd,
+    input mem_to_reg,
 
-    input mem_read,
-    input reg_write,
-
-    output [WORD_SIZE - 1 : 0] write_data,
-    output [REG_SEL - 1 : 0] rd_out,
-
-    output reg_write_out
+    output [WORD_SIZE - 1 : 0] write_data
 
     );
-
-    assign reg_write_out = reg_write;
-    assign rd_out = rd;
-
 
     mux_gen #(
         .NUM_INPUTS(2),
         .DATA_WIDTH(32)
     ) write_select_mux(
         .data({alu_data, memory_data}),
-        .sel(mem_read),
+        .sel(mem_to_reg),
         .out(write_Data)
     );
     
