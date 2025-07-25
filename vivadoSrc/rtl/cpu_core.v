@@ -28,12 +28,10 @@ module cpu_core #(
     ADDR_SIZE = 10
 
     )(
-
     input clk,
     input rst
     );
 
-    wire pc_src, en_pc_reg;
     wire flush_ifid, flush_idex, flush_exmem, flush_memwb;
     wire stall_ifid, stall_idex, stall_exmem, stall_memwb;
 
@@ -50,15 +48,62 @@ module cpu_core #(
     // immediates
     wire [WORD_SIZE - 1 : 0] immd_id;
 
-
     // control signals
-    wire mem_read;
-    wire mem_write;
-    wire mem_to_reg;
-    wire reg_write_out;
-    wire alu_src;
-    wire branch;
-    wire jump;
+    // terminate in ex
+    wire alu_src_id, alu_src_ex;
+    wire forward_select1, forward_select2;
+
+    // terminate in mem
+    wire mem_read_id, mem_read_ex, mem_read_mem;
+    wire mem_write_id, mem_write_ex, mem_write_mem;
+    wire branch_id, branch_ex, branch_mem;
+    wire jump_id, jump_ex, jump_mem;
+
+    // termiante in wb
+    wire mem_to_reg_id, mem_to_reg_ex, mem_to_reg_mem,  mem_to_reg_wb;
+    wire reg_write_id, reg_write_ex, reg_write_mem, reg_write_wb;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
     // Pipeline registers and stages
@@ -138,9 +183,7 @@ module cpu_core #(
     wb_stage writeback();
 
     // External control and hazard units
-    forwarding_unit forwarder();
-
-    hazard_unit hazard_unit();
+    forwarding_unit forwarding_unit();
 
     branch_unit branch_unit();
 
