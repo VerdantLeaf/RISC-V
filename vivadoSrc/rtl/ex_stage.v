@@ -97,8 +97,8 @@ module ex_stage #(
 
     alu alu(
         .alu_op(alu_op),
-        .A(data1),
-        .B(data2),
+        .A(alu1),
+        .B(alu2),
         .result(alu_res),
         .zero(alu_zero)
     );
