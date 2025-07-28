@@ -27,14 +27,14 @@ module mux_3_to_1 #(
         input [DATA_WIDTH - 1 : 0] data1,
         input [DATA_WIDTH - 1 : 0] data2,
         input [1:0]sel,
-        output reg out
+        output reg [DATA_WIDTH - 1 : 0] out
     );
 
     always @(*) begin
         case (sel)
             2'b00: out = data0;
-            2'b00: out = data1;
-            2'b00: out = data2;
+            2'b01: out = data1;
+            2'b10: out = data2;
             default: out = {DATA_WIDTH{1'b0}};
         endcase
     end

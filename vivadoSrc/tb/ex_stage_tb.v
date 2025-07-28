@@ -43,15 +43,16 @@ module ex_stage_tb #(
 
     reg [1 : 0] sel_forward1;
     reg [1 : 0] sel_forward2;
+
     reg [3:0] alu_op;
     reg branch;
     reg jump;
     reg alu_src;
 
+    wire zero;
     wire [ADDR_SIZE - 1 : 0] branch_target;
     wire [WORD_SIZE - 1 : 0] result;
     wire [WORD_SIZE - 1 : 0] write_data;
-    wire zero;
 
     ex_stage dut(
         .pc(pc),
@@ -70,15 +71,14 @@ module ex_stage_tb #(
         .sel_forward2(sel_forward2),
 
         .alu_op(alu_op),
-        .zero(zero),
         .alu_src(alu_src),
         .branch(branch),
         .jump(jump),
 
-        .write_data(write_data),
+        .zero(zero),
         .branch_target(branch_target),
-
-        .result(result)
+        .result(result),
+        .write_data(write_data)
 
     );
 
@@ -126,7 +126,22 @@ module ex_stage_tb #(
 
     initial begin
         $display("---- Starting EX Stage Self-Checking Testbench ----");
-        branch = 0; // For the purposes of this TB, we don't ever need to change branch (or jump, your choice)
+        pc = 0; // init signals to add zero and zero from the first selection of the muxes
+        data1 = 0 ;
+        wb_forward1 = 0;
+        mem_forward1 = 0;
+        data2 = 0;
+        wb_forward2 = 0;
+        mem_forward2 = 0;
+        immd = 0;
+        sel_forward1 = 0;
+        sel_forward2 = 0;
+        alu_op = `ALU_OP_ADD;
+        branch = 0;
+        jump = 0;
+        alu_src = 0;
+
+        #10;
 
         // ---- Basic ALU Tests ---- (ALU has testbench, so don't need to test everything)
         check_test(`__LINE__,
@@ -170,13 +185,13 @@ module ex_stage_tb #(
             0, 5, 5, 0, 0, 0,                   // td1, td2, tmem1, twb1, tmem2, twb2
             2'b01, 2'b00, `ALU_OP_SLT,          // t1sel, t2sel, alu_op
             0, 0, 100, 0,                       // talusrc, t_immd, t_pc, t_jump
-            0, 100, 1);                         // eresult, e_branch_target, e_zero
+            0, 100, 0);                         // eresult, e_branch_target, e_zero
 
         check_test(`__LINE__,
             32'h81111111, 5, 0, 0, 32'hA2000000, 0,     // td1, td2, tmem1, twb1, tmem2, twb2
             2'b00, 2'b01, `ALU_OP_SLTU,                 // t1sel, t2sel, alu_op
             0, 0, 100, 0,                               // talusrc, t_immd, t_pc, t_jump
-            1, 100, 0);                                 // eresult, e_branch_target, e_zero
+            1, 100, 1);                                 // eresult, e_branch_target, e_zero
 
         check_test(`__LINE__,                   
             1, 1, 1, 1, 22342334, 4308902,              // td1, td2, tmem1, twb1, tmem2, twb2

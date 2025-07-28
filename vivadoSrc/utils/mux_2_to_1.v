@@ -28,9 +28,13 @@ module mux_2_to_1 #(
         input [DATA_WIDTH - 1 : 0] data0,
         input [DATA_WIDTH - 1 : 0] data1,
         input sel,
-        output out
+        output reg [DATA_WIDTH - 1 : 0] out
     );
 
-    assign out = (sel) ? data1 : data0;
-
+    always @(*) begin
+        case (sel)
+            1'b0: out = data0;
+            1'b1: out = data1;
+        endcase
+    end
 endmodule

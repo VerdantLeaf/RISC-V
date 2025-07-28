@@ -41,8 +41,10 @@ module ex_stage #(
     input [WORD_SIZE - 1 : 0] mem_forward2,
 
     input [WORD_SIZE - 1 : 0] immd,
+    
     input [1 : 0] sel_forward1,
     input [1 : 0] sel_forward2,
+
     input [3:0] alu_op,
     input alu_src,
     input branch, 
@@ -55,7 +57,7 @@ module ex_stage #(
 
     );
 
-    wire [WORD_SIZE - 1 : 0] alu1, alu2, alu_src1, alu_res;
+    wire [WORD_SIZE - 1 : 0] alu1, alu2, alu_src2, alu_res;
     wire alu_zero;
 
     assign write_data = alu_src2;
