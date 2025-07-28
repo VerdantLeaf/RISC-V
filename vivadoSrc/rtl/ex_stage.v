@@ -45,26 +45,32 @@ module ex_stage #(
     input [1 : 0] sel_forward2,
     input [3:0] alu_op,
     input alu_src,
-    output zero    // If output of ALU is zero. Used for branching
+    input branch, 
+    input jump,
 
+    output zero,    // If output of ALU is zero. Used for branching
     output [ADDR_SIZE - 1 : 0] branch_target,   // addr of branch target
     output [WORD_SIZE - 1 : 0] result,          // also address for saving data
-    output [WORD_SIZE - 1 : 0] write_data,      // data to write to memory
+    output [WORD_SIZE - 1 : 0] write_data       // data to write to memory
 
     );
 
-    wire [WORD_SIZE - 1 : 0] alu1, alu2, alu_src1;
+    wire [WORD_SIZE - 1 : 0] alu1, alu2, alu_src1, alu_res;
+    wire alu_zero;
 
     assign write_data = alu_src2;
+    assign result = alu_res;
 
     // Translate immd to bytes and add to pc to get branch target
-    assign branch_target = pc + (immd << 2);
+    assign branch_target = (branch || jump) ? pc + (immd << 2) : pc;
+    // Mux where to pull zero from based on the alu_op
+    assign zero = (alu_op == `ALU_OP_SLT || alu_op == `ALU_OP_SLTU) ? alu_res : alu_zero;
 
     mux_gen #(
         .NUM_INPUTS(3),
         .DATA_WIDTH(WORD_SIZE)
     ) data1_mux (
-        .data({data1, wb_forward1, mem_forward1}),
+        .data({data1, mem_forward1, wb_forward1}),
         .sel(sel_forward1),
         .out(alu1)
     );
@@ -73,7 +79,7 @@ module ex_stage #(
         .NUM_INPUTS(3),
         .DATA_WIDTH(WORD_SIZE)
     ) data2_mux (
-        .data({data2, wb_forward2, mem_forward2}),
+        .data({data2, mem_forward2, wb_forward2}),
         .sel(sel_forward2),
         .out(alu_src2)
     );
@@ -89,10 +95,10 @@ module ex_stage #(
 
     alu alu(
         .alu_op(alu_op),
-        .arg1(data1),
-        .arg2(data2),
-        .result(result),
-        .zero(zero)
+        .A(data1),
+        .B(data2),
+        .result(alu_res),
+        .zero(alu_zero)
     );
 
 endmodule

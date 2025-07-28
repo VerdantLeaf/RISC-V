@@ -44,6 +44,7 @@ module alu #(
     wire signed [WORD_SIZE - 1 : 0] signed_B = $signed(B);
 
     always @(*) begin
+
         case (alu_op)
             `ALU_OP_ADD:    result = A + B; // overflow bit in the future {overflow, result}
             `ALU_OP_SUB:    result = A - B;

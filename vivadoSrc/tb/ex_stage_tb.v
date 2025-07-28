@@ -25,7 +25,8 @@ module ex_stage_tb #(
 
     WORD_SIZE = 32,
     NUM_REGS = 32,
-    REG_SEL = $clog2(NUM_REGS)
+    REG_SEL = $clog2(NUM_REGS),
+    ADDR_SIZE = 10
 
     )();
     reg [ADDR_SIZE - 1 : 0] pc;
@@ -43,11 +44,9 @@ module ex_stage_tb #(
     reg [1 : 0] sel_forward1;
     reg [1 : 0] sel_forward2;
     reg [3:0] alu_op;
-
+    reg branch;
+    reg jump;
     reg alu_src;
-
-    reg [1:0] data_size;
-    reg data_sign;
 
     wire [ADDR_SIZE - 1 : 0] branch_target;
     wire [WORD_SIZE - 1 : 0] result;
@@ -65,10 +64,6 @@ module ex_stage_tb #(
         .wb_forward2(wb_forward2),
         .mem_forward2(mem_forward2),
 
-        .rs1(rs1),
-        .rs2(rs2),
-        .rd(rd),
-
         .immd(immd),
 
         .sel_forward1(sel_forward1),
@@ -77,11 +72,10 @@ module ex_stage_tb #(
         .alu_op(alu_op),
         .zero(zero),
         .alu_src(alu_src),
+        .branch(branch),
+        .jump(jump),
 
         .write_data(write_data),
-        .data_size(data_size),
-        .data_sign(data_sign),
-
         .branch_target(branch_target),
 
         .result(result)
@@ -92,13 +86,13 @@ module ex_stage_tb #(
 
     task check_test;
         input integer line_num;
-        input [WORD_SIZE - 1 : 0] t_data1, t_data2, t_wb_f1, t_mem_f1, t_wb_f2, t_mem_f2;
+        input [WORD_SIZE - 1 : 0] t_data1, t_data2, t_mem_f1, t_wb_f1, t_mem_f2, t_wb_f2;
         input [1:0] t_f1_sel, t_f2_sel;
         input [3:0] t_alu_op;
         input t_alu_src;
         input [WORD_SIZE - 1 : 0] t_immd;
         input [WORD_SIZE - 1 : 0] t_pc;
-        input [4:0] t_rs1, t_rs2, t_rd;
+        input t_jump;
 
         input [WORD_SIZE - 1 : 0] e_result, e_branch_target;
         input e_zero;
@@ -108,12 +102,12 @@ module ex_stage_tb #(
             data1 = t_data1; data2 = t_data2;
             wb_forward1 = t_wb_f1; mem_forward1 = t_mem_f1;
             wb_forward2 = t_wb_f2; mem_forward2 = t_mem_f2;
-            sel_forward1 = t_f1_sel; sel_forward = t_f2_sel;
+            sel_forward1 = t_f1_sel; sel_forward2 = t_f2_sel;
             alu_op = t_alu_op;
             alu_src = t_alu_src;
             immd = t_immd;
             pc = t_pc;
-            rs1 = t_rs1; rs2 = t_rs2; rd = t_rd;
+            jump = t_jump;
             #5;
 
             // Compare
@@ -121,8 +115,8 @@ module ex_stage_tb #(
                $display("PASS @ line %0d", line_num);
                 pass_count = pass_count + 1;
             end else begin
-                $display("FAIL @ line %0d | PC=%0d | ALU_OP=%b | Got: Result=%h, Zero=%b, Branch_Target=%h | Expected: Result=%h, Zero=%b, Branch_Target=%h",
-                         line_num, pc, alu_op, result, zero, branch_target, e_result, e_zero, e_branch_target);
+                $display("***FAIL @ line %0d***\nGot: Result=%h, Zero=%b, Branch_Target=%d\nExpected: Result=%h, Zero=%b, Branch_Target=%d\n",
+                         line_num, result, zero, branch_target, e_result, e_zero, e_branch_target);
                 fail_count = fail_count + 1;
             end
         end
@@ -132,55 +126,95 @@ module ex_stage_tb #(
 
     initial begin
         $display("---- Starting EX Stage Self-Checking Testbench ----");
-        
-        // ---- Basic ALU Tests ----
+        branch = 0; // For the purposes of this TB, we don't ever need to change branch (or jump, your choice)
+
+        // ---- Basic ALU Tests ---- (ALU has testbench, so don't need to test everything)
         check_test(`__LINE__,
-            10, 5, 0, 0, 0, 0,                  // td1, td2, twb1, tmem1, twb2, tmem2
+            10, 5, 0, 0, 0, 0,                  // td1, td2, tmem1, twb1, tmem2, twb2
             2'b00, 2'b00, `ALU_OP_ADD,          // t1sel, t2sel, alu_op
-            0, 0, 100,                          // talusrc, t_immd, t_pc
-            1, 2, 3,                            // trs1, trs2, trd 
+            0, 0, 100, 0,                       // talusrc, t_immd, t_pc, t_jump
             15, 100, 0);                        // eresult, e_branch_target, e_zero
 
         check_test(`__LINE__,
-            1, 5, 0, 0, 0, 0,                  // td1, td2, twb1, tmem1, twb2, tmem2
-            2'b00, 2'b00, `ALU_OP_ADD,          // t1sel, t2sel, alu_op
-            0, 0, 100,                          // talusrc, t_immd, t_pc
-            1, 2, 3,                            // trs1, trs2, trd 
-            15, 100, 0);                        // eresult, e_branch_target, e_zero
+            255, 255, 0, 0, 0, 0,               // td1, td2, tmem1, twb1, tmem2, twb2
+            2'b00, 2'b00, `ALU_OP_SUB,          // t1sel, t2sel, alu_op
+            0, 0, 100, 0,                       // talusrc, t_immd, t_pc, t_jump
+            0, 100, 1);                         // eresult, e_branch_target, e_zero
 
-        check_test(`__LINE__,
-            10, 5, 0, 0, 0, 0,                  // td1, td2, twb1, tmem1, twb2, tmem2
-            2'b00, 2'b00, `ALU_OP_ADD,          // t1sel, t2sel, alu_op
-            0, 0, 100,                          // talusrc, t_immd, t_pc
-            1, 2, 3,                            // trs1, trs2, trd 
-            15, 100, 0);                        // eresult, e_branch_target, e_zero
+        check_test(`__LINE__, 
+            32'hFEDCBA98, 24, 0,0,0,0,          // td1, td2, tmem1, twb1, tmem2, twb2
+            2'b00, 2'b00, `ALU_OP_SRL,          // t1sel, t2sel, alu_op
+            0, 0, 100, 0,                       // talusrc, t_immd, t_pc, t_jump
+            32'h000000FE, 100, 0);              // eresult, e_branch_target, e_zero
 
-        check_test(`__LINE__,
-            10, 5, 0, 0, 0, 0,                  // td1, td2, twb1, tmem1, twb2, tmem2
-            2'b00, 2'b00, `ALU_OP_ADD,          // t1sel, t2sel, alu_op
-            0, 0, 100,                          // talusrc, t_immd, t_pc
-            1, 2, 3,                            // trs1, trs2, trd 
-            15, 100, 0);                        // eresult, e_branch_target, e_zero
-
-        check_test(`__LINE__,
-            10, 5, 0, 0, 0, 0,                  // td1, td2, twb1, tmem1, twb2, tmem2
-            2'b00, 2'b00, `ALU_OP_ADD,          // t1sel, t2sel, alu_op
-            0, 0, 100,                          // talusrc, t_immd, t_pc
-            1, 2, 3,                            // trs1, trs2, trd 
-            15, 100, 0);                        // eresult, e_branch_target, e_zero
-
-        check_test(`__LINE__, 10, 5, 0,0,0,0, 2'b00,2'b00, 4'b1000,0,0,100,1,2,3, 5,    100,0);    // SUB
-        check_test(`__LINE__, 5,  5, 0,0,0,0, 2'b00,2'b00, 4'b1000,0,0,100,1,2,3, 0,    100,1);     // SUB -> zero=1
+        check_test(`__LINE__, 
+            32'h0123CDEF, 32'h00000000, 0,0,0,0,    // td1, td2, tmem1, twb1, tmem2, twb2
+            2'b00, 2'b00, `ALU_OP_AND,              // t1sel, t2sel, alu_op
+            0, 0, 100, 0,                           // talusrc, t_immd, t_pc, t_jump
+            0, 100, 1);                             // eresult, e_branch_target, e_zero
 
         // ---- Forwarding Tests ----
-        check_test(`__LINE__, 99, 0, 123,456,77,88, 2'b01,2'b10, 4'b0000,0,0,100,1,2,3, 123+456,0,100);
+        check_test(`__LINE__,
+            324, 2, 4, 6, 8, 16,                // td1, td2, tmem1, twb1, tmem2, twb2
+            2'b00, 2'b01, `ALU_OP_SUB,          // t1sel, t2sel, alu_op
+            0, 0, 100, 0,                       // talusrc, t_immd, t_pc, t_jump
+            (324 - 8), 100, 0);                 // eresult, e_branch_target, e_zero
+
+        check_test(`__LINE__,
+            32'h01234567, 0, 0, 0, 0, 12,       // td1, td2, tmem1, twb1, tmem2, twb2
+            2'b00, 2'b10, `ALU_OP_SLL,          // t1sel, t2sel, alu_op
+            0, 0, 100, 0,                       // talusrc, t_immd, t_pc, t_jump
+            32'h01234000, 100, 0);              // eresult, e_branch_target, e_zero
+
+        check_test(`__LINE__,
+            0, 5, 5, 0, 0, 0,                   // td1, td2, tmem1, twb1, tmem2, twb2
+            2'b01, 2'b00, `ALU_OP_SLT,          // t1sel, t2sel, alu_op
+            0, 0, 100, 0,                       // talusrc, t_immd, t_pc, t_jump
+            0, 100, 1);                         // eresult, e_branch_target, e_zero
+
+        check_test(`__LINE__,
+            32'h81111111, 5, 0, 0, 32'hA2000000, 0,     // td1, td2, tmem1, twb1, tmem2, twb2
+            2'b00, 2'b01, `ALU_OP_SLTU,                 // t1sel, t2sel, alu_op
+            0, 0, 100, 0,                               // talusrc, t_immd, t_pc, t_jump
+            1, 100, 0);                                 // eresult, e_branch_target, e_zero
+
+        check_test(`__LINE__,                   
+            1, 1, 1, 1, 22342334, 4308902,              // td1, td2, tmem1, twb1, tmem2, twb2
+            2'b10, 2'b10, `ALU_OP_OR,                   // t1sel, t2sel, alu_op
+            0, 0, 100, 0,                               // talusrc, t_immd, t_pc, t_jump
+            (22342334 | 4308902), 100, 0);              // eresult, e_branch_target, e_zero
 
         // ---- Immediate ALU Src ----
-        check_test(`__LINE__, 20, 5, 0,0,0,0, 2'b00,2'b00, 4'b0000,1,32'd100,200,4,5,6, 120,0,200);
+        check_test(`__LINE__,
+            -47, 2127, 0, 0, 0, 0,          // td1, td2, tmem1, twb1, tmem2, twb2
+            2'b00, 2'b00, `ALU_OP_ADD,      // t1sel, t2sel, alu_op
+            1, 47, 100, 0,                  // talusrc, t_immd, t_pc, t_jump
+            0, 100, 1);                     // eresult, e_branch_target, e_zero
+
+        check_test(`__LINE__,                   
+            32'hA050A050, 1, 321, 123, 2, 4,           // td1, td2, tmem1, twb1, tmem2, twb2
+            2'b00, 2'b10, `ALU_OP_XOR,                 // t1sel, t2sel, alu_op
+            1, 32'h462ABC4F, 100, 0,                   // talusrc, t_immd, t_pc, t_jump
+            (32'hA050A050 ^ 32'h462ABC4F), 100, 0);    // eresult, e_branch_target, e_zero
 
         // ---- Branch Target ----
-        check_test(`__LINE__, 0, 0, 0,0,0,0, 2'b00,2'b00, 4'b0000,0,32'd16,32'd100,1,2,3, 0,0,(100 + (16 << 2)));
+        check_test(`__LINE__,                   
+            32'hA050A050, 1, 321, 123, 2, 32'hA050A050, // td1, td2, tmem1, twb1, tmem2, twb2
+            2'b00, 2'b10, `ALU_OP_SUB,                  // t1sel, t2sel, alu_op
+            0, 16, 100, 1,                              // talusrc, t_immd, t_pc, t_jump
+            32'h00000000, (100 + (16 << 2)), 1);        // eresult, e_branch_target, e_zero
 
+        check_test(`__LINE__,                   
+            421, 231, 0, 0, 0, 0,                       // td1, td2, tmem1, twb1, tmem2, twb2
+            2'b00, 2'b00, `ALU_OP_SLT,                  // t1sel, t2sel, alu_op
+            0, 292, 1036, 1,                            // talusrc, t_immd, t_pc, t_jump
+            0, (1036 + (292 << 2)), 0);                 // eresult, e_branch_target, e_zero
+
+        check_test(`__LINE__,                   
+            32'hFFFF0000, 32'hFFFF1111, 0, 0, 0, 0,     // td1, td2, tmem1, twb1, tmem2, twb2
+            2'b00, 2'b00, `ALU_OP_SLTU,                 // t1sel, t2sel, alu_op
+            0, 96, 3024, 1,                             // talusrc, t_immd, t_pc, t_jump
+            1, (3024 + (96 << 2)), 1);                  // eresult, e_branch_target, e_zero
 
         $display("---- TESTS FINISHED ----");
         $display("TOTAL: %0d PASSED | %0d FAILED ", pass_count, fail_count);
