@@ -3,9 +3,9 @@
 // Company: 
 // Engineer: 
 // 
-// Create Date: 07/28/2025 02:01:37 PM
+// Create Date: 07/28/2025 02:31:54 PM
 // Design Name: 
-// Module Name: mux_gen_tb
+// Module Name: mux_2_to_1
 // Project Name: 
 // Target Devices: 
 // Tool Versions: 
@@ -20,21 +20,17 @@
 //////////////////////////////////////////////////////////////////////////////////
 
 
-module mux_gen_tb #(
+module mux_2_to_1 #(
 
-    NUM_INPUTS = 2,
     DATA_WIDTH = 32
 
-    )();
+    )(
+        input [DATA_WIDTH - 1 : 0] data0,
+        input [DATA_WIDTH - 1 : 0] data1,
+        input sel,
+        output out
+    );
 
-    reg [DATA_WIDTH * NUM_INPUTS - 1 : 0] data;
-    reg [$clog2(NUM_INPUTS) - 1:0] sel;
-    wire [DATA_WIDTH - 1:0] out;
-
-    mux_gen dut(
-        .data(data),
-        .sel(sel),
-        .out(out)
-    )
+    assign out = (sel) ? data1 : data0;
 
 endmodule

@@ -115,7 +115,7 @@ module ex_stage_tb #(
                $display("PASS @ line %0d", line_num);
                 pass_count = pass_count + 1;
             end else begin
-                $display("***FAIL @ line %0d***\nGot: Result=%h, Zero=%b, Branch_Target=%d\nExpected: Result=%h, Zero=%b, Branch_Target=%d\n",
+                $display("***FAIL @ line %0d***\nGot: Result=%h, Zero=%b, Branch_Target=%d\nExp: Result=%h, Zero=%b, Branch_Target=%d\n",
                          line_num, result, zero, branch_target, e_result, e_zero, e_branch_target);
                 fail_count = fail_count + 1;
             end

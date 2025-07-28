@@ -66,29 +66,31 @@ module ex_stage #(
     // Mux where to pull zero from based on the alu_op
     assign zero = (alu_op == `ALU_OP_SLT || alu_op == `ALU_OP_SLTU) ? alu_res : alu_zero;
 
-    mux_gen #(
-        .NUM_INPUTS(3),
+    mux_3_to_1 #(
         .DATA_WIDTH(WORD_SIZE)
     ) data1_mux (
-        .data({data1, mem_forward1, wb_forward1}),
+        .data0(data1),
+        .data1(mem_forward1),
+        .data2(wb_forward1),
         .sel(sel_forward1),
         .out(alu1)
     );
 
-    mux_gen #(
-        .NUM_INPUTS(3),
+    mux_3_to_1 #(
         .DATA_WIDTH(WORD_SIZE)
     ) data2_mux (
-        .data({data2, mem_forward2, wb_forward2}),
+        .data0(data2),
+        .data1(mem_forward2),
+        .data2(wb_forward2),
         .sel(sel_forward2),
         .out(alu_src2)
     );
 
-    mux_gen #(
-        .NUM_INPUTS(2),
+    mux_2_to_1 #(
         .DATA_WIDTH(WORD_SIZE)
     ) alu_src_mux (
-        .data({alu_src2, immd}),
+        .data0(alu_src2),
+        .data1(immd),
         .sel(alu_src),
         .out(alu2)
     );

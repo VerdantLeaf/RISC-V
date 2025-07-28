@@ -2,7 +2,8 @@
 verilog xil_defaultlib  --include "../../../../RV32I_Core.srcs/sources_1/imports/utils" --include "../../../../../vivadoSrc/utils" \
 "../../../../../vivadoSrc/rtl/alu.v" \
 "../../../../../vivadoSrc/rtl/ex_stage.v" \
-"../../../../../vivadoSrc/utils/mux_gen.v" \
+"../../../../../vivadoSrc/utils/mux_2_to_1.v" \
+"../../../../../vivadoSrc/utils/mux_3_to_1.v" \
 "../../../../../vivadoSrc/tb/ex_stage_tb.v" \
 
 # compile glbl module

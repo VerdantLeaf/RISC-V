@@ -19,19 +19,23 @@
 // 
 //////////////////////////////////////////////////////////////////////////////////
 
-module mux_gen
-    #(
-    NUM_INPUTS = 2,
+module mux_3_to_1 #(
     DATA_WIDTH = 32
+
     )(
-    // data is concatenated to each other
-    input wire [DATA_WIDTH * NUM_INPUTS - 1 : 0] data,
-    input wire [$clog2(NUM_INPUTS) - 1:0] sel,
-    output reg [DATA_WIDTH - 1:0] out
+        input [DATA_WIDTH - 1 : 0] data0,
+        input [DATA_WIDTH - 1 : 0] data1,
+        input [DATA_WIDTH - 1 : 0] data2,
+        input [1:0]sel,
+        output reg out
     );
+
     always @(*) begin
-        if (sel < NUM_INPUTS) out = data[sel * DATA_WIDTH +: DATA_WIDTH]; // Start selection slice at sel * width
-        else out = {DATA_WIDTH{1'b0}}; // Output all zeros for out of range selections
+        case (sel)
+            2'b00: out = data0;
+            2'b00: out = data1;
+            2'b00: out = data2;
+            default: out = {DATA_WIDTH{1'b0}};
+        endcase
     end
-    
 endmodule
