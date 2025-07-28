@@ -58,12 +58,12 @@ module ex_stage_tb #(
         .pc(pc),
 
         .data1(data1),
-        .wb_forward1(wb_forward1),
         .mem_forward1(mem_forward1),
+        .wb_forward1(wb_forward1),
 
         .data2(data2),
-        .wb_forward2(wb_forward2),
         .mem_forward2(mem_forward2),
+        .wb_forward2(wb_forward2),
 
         .immd(immd),
 
@@ -91,7 +91,7 @@ module ex_stage_tb #(
         input [3:0] t_alu_op;
         input t_alu_src;
         input [WORD_SIZE - 1 : 0] t_immd;
-        input [WORD_SIZE - 1 : 0] t_pc;
+        input [ADDR_SIZE - 1 : 0] t_pc;
         input t_jump;
 
         input [WORD_SIZE - 1 : 0] e_result, e_branch_target;
@@ -179,7 +179,7 @@ module ex_stage_tb #(
             32'h01234567, 0, 0, 0, 0, 12,       // td1, td2, tmem1, twb1, tmem2, twb2
             2'b00, 2'b10, `ALU_OP_SLL,          // t1sel, t2sel, alu_op
             0, 0, 100, 0,                       // talusrc, t_immd, t_pc, t_jump
-            32'h01234000, 100, 0);              // eresult, e_branch_target, e_zero
+            (32'h01234567 << 12), 100, 0);              // eresult, e_branch_target, e_zero
 
         check_test(`__LINE__,
             0, 5, 5, 0, 0, 0,                   // td1, td2, tmem1, twb1, tmem2, twb2
@@ -194,7 +194,7 @@ module ex_stage_tb #(
             1, 100, 1);                                 // eresult, e_branch_target, e_zero
 
         check_test(`__LINE__,                   
-            1, 1, 1, 1, 22342334, 4308902,              // td1, td2, tmem1, twb1, tmem2, twb2
+            1, 1, 1, 22342334, 1, 4308902,              // td1, td2, tmem1, twb1, tmem2, twb2
             2'b10, 2'b10, `ALU_OP_OR,                   // t1sel, t2sel, alu_op
             0, 0, 100, 0,                               // talusrc, t_immd, t_pc, t_jump
             (22342334 | 4308902), 100, 0);              // eresult, e_branch_target, e_zero
@@ -222,14 +222,14 @@ module ex_stage_tb #(
         check_test(`__LINE__,                   
             421, 231, 0, 0, 0, 0,                       // td1, td2, tmem1, twb1, tmem2, twb2
             2'b00, 2'b00, `ALU_OP_SLT,                  // t1sel, t2sel, alu_op
-            0, 292, 1036, 1,                            // talusrc, t_immd, t_pc, t_jump
-            0, (1036 + (292 << 2)), 0);                 // eresult, e_branch_target, e_zero
+            0, 196, 84, 1,                              // talusrc, t_immd, t_pc, t_jump
+            0, (84 + (196 << 2)), 0);                   // eresult, e_branch_target, e_zero
 
         check_test(`__LINE__,                   
             32'hFFFF0000, 32'hFFFF1111, 0, 0, 0, 0,     // td1, td2, tmem1, twb1, tmem2, twb2
             2'b00, 2'b00, `ALU_OP_SLTU,                 // t1sel, t2sel, alu_op
-            0, 96, 3024, 1,                             // talusrc, t_immd, t_pc, t_jump
-            1, (3024 + (96 << 2)), 1);                  // eresult, e_branch_target, e_zero
+            0, 40, 636, 1,                              // talusrc, t_immd, t_pc, t_jump
+            1, (636 + (40 << 2)), 1);                   // eresult, e_branch_target, e_zero
 
         $display("---- TESTS FINISHED ----");
         $display("TOTAL: %0d PASSED | %0d FAILED ", pass_count, fail_count);
