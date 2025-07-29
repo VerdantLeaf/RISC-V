@@ -34,12 +34,12 @@ module ex_stage #(
     input [ADDR_SIZE - 1 : 0] pc,   // According to the RISC-V standard, this is the pc 
                                     // after the instruction in this stage of the pipeline
     input [WORD_SIZE - 1 : 0] data1,
-    input [WORD_SIZE - 1 : 0] wb_forward1,
     input [WORD_SIZE - 1 : 0] mem_forward1,
+    input [WORD_SIZE - 1 : 0] wb_forward1,
 
     input [WORD_SIZE - 1 : 0] data2,
-    input [WORD_SIZE - 1 : 0] wb_forward2,
     input [WORD_SIZE - 1 : 0] mem_forward2,
+    input [WORD_SIZE - 1 : 0] wb_forward2,
 
     input [WORD_SIZE - 1 : 0] immd,
     

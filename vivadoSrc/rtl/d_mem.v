@@ -23,7 +23,7 @@ module d_mem #(
 
     NUM_WORDS = 1024,
     WORD_SIZE = 32,
-    ADDR_SIZE = 10
+    ADDR_SIZE = $clog2(NUM_WORDS)
     
     )(
     // Note: need to understand and document read/write to same address collision behavior

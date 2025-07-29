@@ -24,8 +24,9 @@ module mem_stage #(
 
     WORD_SIZE = 32,
     NUM_REGS = 32,
+    NUM_WORDS = 1024,
     REG_SEL = $clog2(NUM_REGS),
-    ADDR_SIZE = 10
+    ADDR_SIZE = $clog2(NUM_WORDS)
 
     )(
 
@@ -56,7 +57,13 @@ module mem_stage #(
 
     );
 
-    d_mem datamemory(
+    assign pc_src = ((branch && zero ) || jump) ? 1'b1 : 1'b0;
+
+    d_mem #(
+        .NUM_WORDS(NUM_WORDS),
+        .WORD_SIZE(WORD_SIZE),
+        .ADDR_SIZE(ADDR_SIZE)
+    ) datamemory (
         .clk(clk),
 
         // Don't use port A for now
