@@ -25,13 +25,14 @@ module cpu_core #(
     WORD_SIZE = 32,
     NUM_REGS = 32,
     REG_SEL = $clog2(NUM_REGS),
-    ADDR_SIZE = 10
+    NUM_WORDS = 1024,
+    ADDR_SIZE = $clog2(NUM_WORDS)
 
     )(
     input clk,
     input rst
     );
-
+    // Pipeline reg flush/stall
     wire flush_ifid, flush_idex, flush_exmem, flush_memwb;
     wire stall_ifid, stall_idex, stall_exmem, stall_memwb;
 
@@ -39,15 +40,17 @@ module cpu_core #(
     wire [ADDR_SIZE - 1 : 0] branch_target;
     wire [ADDR_SIZE - 1 : 0] pc_if, pc_id, pc_ex;
     wire [WORD_SIZE - 1 : 0] instr_if, instr_id;
-    wire [WORD_SIZE - 1 : 0] data1_id, data2_id, data1_ex, data2_ex;
-
-    // write back
-    wire reg_write_mem, reg_write_wb;
-    wire [WORD_SIZE - 1 : 0] write_data;
-    wire [REG_SEL - 1 : 0] write_select;
+    wire [WORD_SIZE - 1 : 0] data1_id, data1_ex;
+    wire [WORD_SIZE - 1 : 0] data2_id, data2_ex;
 
     // immediates
     wire [WORD_SIZE - 1 : 0] immd_id, immd_ex;
+
+    // rs1...
+    wire [WORD_SIZE - 1 : 0] rs1_id, rs1_ex;
+    wire [WORD_SIZE - 1 : 0] rs2_id, rs2_ex;
+    wire [WORD_SIZE - 1 : 0] rd_id, rd_ex, rd_mem, rd_wb;
+
 
     // control signals
     // terminate in ex
@@ -60,6 +63,8 @@ module cpu_core #(
     wire mem_write_id, mem_write_ex, mem_write_mem;
     wire branch_id, branch_ex, branch_mem;
     wire jump_id, jump_ex, jump_mem;
+    wire [1:0] data_size_id, data_size_ex, data_size_mem;
+    wire data_sign_id, data_sign_ex, data_sign_mem;
 
     // termiante in wb
     wire mem_to_reg_id, mem_to_reg_ex, mem_to_reg_mem,  mem_to_reg_wb;
@@ -73,43 +78,14 @@ module cpu_core #(
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
     // Pipeline registers and stages
-    if_stage instructionfetch(
+    if_stage #(
+
+        .WORD_SIZE(WORD_SIZE),
+        .NUM_WORDS(NUM_WORDS),
+        .ADDR_SIZE(ADDR_SIZE)
+
+    ) instructionfetch (
         .clk(clk),
         .rst(rst),
         
@@ -122,7 +98,11 @@ module cpu_core #(
         .instr(instr_if)
     );
 
-    if_id_reg IFID_register(
+    if_id_reg #(
+       
+        .WORD_SIZE(WORD_SIZE)
+
+    ) IFID_register (
         .clk(clk),
         .rst(rst),
         .flush(flush_ifid),
@@ -138,6 +118,7 @@ module cpu_core #(
     id_stage #(
         .WORD_SIZE(WORD_SIZE),
         .NUM_REGS(NUM_REGS),
+        .NUM_WORDS(NUM_WORDS),
         .REG_SEL(REG_SEL),
         .ADDR_SIZE(ADDR_SIZE)
     ) instructiondecode (
@@ -146,17 +127,17 @@ module cpu_core #(
 
         .instr(instr_id),
 
-        .reg_write(reg_write_wb),
-        .rd_data(write_data),
-        .rd_select(write_select),
+        .reg_write(),
+        .rd_data(),
+        .rd_select(rd_wb),
 
         .immd(immd_id),
         .data1(),
         .data2(),
         .alu_op(alu_op_id),
-        .rd(),
-        .rs1(),
-        .rs2(),
+        .rd(rd_id),
+        .rs1(rs1_id),
+        .rs2(rs2_id),
 
         .mem_read(mem_read_id),
         .mem_write(mem_write_id),
@@ -166,11 +147,19 @@ module cpu_core #(
         .branch(branch_id),
         .jump(jump_id),
 
-        .data_size(),
-        .data_sign(),
+        .data_size(data_size_id),
+        .data_sign(data_sign_id),
     );
 
-    id_ex_reg IDEX_register(
+    id_ex_reg #(
+
+        .WORD_SIZE(WORD_SIZE),
+        .NUM_REGS(NUM_REGS),
+        .NUM_WORDS(NUM_WORDS),
+        .REG_SEL(NUM_REGS),
+        .ADDR_SIZE(ADDR_SIZE)
+
+    ) IDEX_register (
         .clk(clk),
         .rst(rst),
         .flush(flush_idex),
@@ -182,9 +171,9 @@ module cpu_core #(
         .data2(),
 
         .alu_op(alu_op_id),
-        .rd(),
-        .rs1(),
-        .rs2(),
+        .rd(rd_id),
+        .rs1(rs1_id),
+        .rs2(rs2_id),
 
         .mem_read(mem_read_id),
         .mem_write(mem_write_id),
@@ -194,8 +183,8 @@ module cpu_core #(
         .branch(branch_id),
         .jump(jump_id),
 
-        .data_size(),
-        .data_sign(),
+        .data_size(data_size_id),
+        .data_sign(data_sign_id),
 
         .pc_out(pc_ex),
         .immd_out(),
@@ -203,9 +192,9 @@ module cpu_core #(
         .data2_out(),
 
         .alu_op_out(alu_op_ex),
-        .rs1_out(),
-        .rs2_out(),
-        .rd_out(),
+        .rs1_out(rs1_ex),
+        .rs2_out(rs2_ex),
+        .rd_out(rd_ex),
 
         .mem_read_out(mem_read_ex),
         .mem_write_out(mem_write_ex),
@@ -215,25 +204,77 @@ module cpu_core #(
         .branch_out(branch_ex),
         .jump_out(jump_ex),
         
-        .data_size_out(),
-        .data_sign_out()
+        .data_size_out(data_size_ex),
+        .data_sign_out(data_sign_ex)
 
     );
 
     ex_stage #(
         .WORD_SIZE(WORD_SIZE),
         .NUM_REGS(NUM_REGS),
+        .NUM_WORDS(NUM_WORDS),
         .REG_SEL(NUM_REGS),
         .ADDR_SIZE(ADDR_SIZE)
     )execution(
         .pc(pc_ex),
     );
 
-    ex_mem_reg EXMEM_register();
+    ex_mem_reg #(
+        .WORD_SIZE(WORD_SIZE),
+        .NUM_REGS(NUM_REGS),
+        .NUM_WORDS(NUM_WORDS),
+        .REG_SEL(REG_SEL),
+        .ADDR_SIZE(ADDR_SIZE)
+    ) EXMEM_register (
+        .clk(clk),
+        .rst(rst),
+        .flush(flush_exmem),
+        .stall(stall_exmem),
+
+        .branch_target(),
+        .alu_result(),
+        .rd(rd_ex),
+
+        .mem_read(),
+        .mem_write(),
+        .mem_to_reg(),
+        .reg_write(),
+        .alu_zero(),
+        .branch(),
+        .jump(),
+
+        .write_data(),
+        .data_size(data_size_ex),
+        .data_sign(data_sign_ex),
+
+
+        .branch_target_out(),
+        .alu_result_out(),
+        .rd_out(rd_mem),
+
+        .mem_read_out(),
+        .mem_write_out(),
+        .mem_to_reg_out(),
+        .reg_write_out(),
+        .alu_zero_out(),
+        .branch_out(),
+        .jump_out(),
+
+        .write_data_out(),
+        .data_size_out(data_size_mem),
+        .data_sign_out(data_sign_mem)
+    );
 
     mem_stage memory();
 
-    mem_wb_reg MEMWB_register();
+    mem_wb_reg #(
+
+    ) MEMWB_register (
+        
+        .rd(rd_mem),
+
+        .rd(rd_wb)
+    );
 
     wb_stage #(
         .WORD_SIZE(WORD_SIZE)

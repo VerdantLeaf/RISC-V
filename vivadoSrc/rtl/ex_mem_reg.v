@@ -24,8 +24,9 @@ module ex_mem_reg #(
 
     WORD_SIZE = 32,
     NUM_REGS = 32,
+    NUM_WORDS = 1024,
     REG_SEL = $clog2(NUM_REGS),
-    ADDR_SIZE = 10
+    ADDR_SIZE = $clog2(NUM_WORDS)
 
     )(
  
@@ -38,13 +39,13 @@ module ex_mem_reg #(
     input [WORD_SIZE - 1 : 0] alu_result,       // The result of the ALU operation
     input [REG_SEL - 1 : 0] rd,                 // Select register to write to
 
-    input alu_zero,             // is alu result zero (if it is, we branch)
-    input branch,               // is instruction a branch instruction
-    input jump,                 // is instruction a jump instruction
     input mem_read,             // enable mem read
     input mem_write,            // enable mem write
     input mem_to_reg,           // where should we read from
     input reg_write,            // enable write back for memory
+    input alu_zero,             // is alu result zero (if it is, we branch)
+    input branch,               // is instruction a branch instruction
+    input jump,                 // is instruction a jump instruction
 
     input [WORD_SIZE - 1 : 0] write_data,   // Data written to memory
     input [1:0] data_size,                  // Tells the size of the data 00->byte, 01->halfword, 10->word
@@ -54,17 +55,17 @@ module ex_mem_reg #(
     output reg [WORD_SIZE - 1 : 0] alu_result_out,       
     output reg [REG_SEL - 1 : 0] rd_out,  
 
-    output reg alu_zero_out,             
-    output reg branch_out,   
-    output reg jump_out,            
     output reg mem_read_out,             
     output reg mem_write_out,            
     output reg mem_to_reg_out,
     output reg reg_write_out,
+    output reg alu_zero_out,             
+    output reg branch_out,   
+    output reg jump_out, 
 
     output reg [WORD_SIZE - 1 : 0] write_data_out,       
-    output reg data_sign_out,
-    output reg [1:0] data_size_out
+    output reg [1:0] data_size_out,
+    output reg data_sign_out
 
     );
     

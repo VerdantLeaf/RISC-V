@@ -25,8 +25,9 @@ module id_ex_reg #(
     
     WORD_SIZE = 32,
     NUM_REGS = 32,
+    NUM_WORDS = 1024,
     REG_SEL = $clog2(NUM_REGS),
-    ADDR_SIZE = 10
+    ADDR_SIZE = $clog2(NUM_WORDS)
 
     )(
     input clk,

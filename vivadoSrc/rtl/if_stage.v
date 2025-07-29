@@ -23,7 +23,8 @@
 module if_stage #(
     
     WORD_SIZE = 32,
-    ADDR_SIZE = 10
+    NUM_WORDS = 1024,
+    ADDR_SIZE = $clog2(NUM_WORDS)
 
     )(
     input clk,
