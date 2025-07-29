@@ -22,9 +22,7 @@
 
 module wb_stage #(
 
-    WORD_SIZE = 32,
-    NUM_REGS = 32,
-    REG_SEL = $clog2(NUM_REGS)
+    WORD_SIZE = 32
 
     )(
 
@@ -36,11 +34,11 @@ module wb_stage #(
 
     );
 
-    mux_gen #(
-        .NUM_INPUTS(2),
+    mux_2_to_1 #(
         .DATA_WIDTH(32)
     ) write_select_mux(
-        .data({alu_data, memory_data}),
+        .data0(alu_data),
+        .data1(memory_data),
         .sel(mem_to_reg),
         .out(write_Data)
     );

@@ -39,7 +39,7 @@ module i_mem_tb;
     integer i;
     initial begin
         addr = 0;
-        for (i = 0; i < 32; i = i + 1) begin
+        for (i = 0; i < 64; i = i + 1) begin
             @(posedge clk);
             addr = i << 2; // Word-aligned addresses
             @(posedge clk);

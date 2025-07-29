@@ -25,6 +25,13 @@ module top(
     );
     // Set up different external I/o connectivity to ARTY board
 
+    // Parameters to pass down
+    localparam WORD_SIZE = 32;
+    localparam NUM_REGS = 32;
+    localparam NUM_WORDS = 1024;
+    localparam ADDR_SIZE = $clog2(NUM_WORDS);
+    localparam REG_SEL = $clog2(NUM_REGS);
+
     cpu_core rv32i_core();
 
 

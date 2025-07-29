@@ -31,9 +31,9 @@ module d_mem #(
     input clk,
 
     // Instruction port (Port A)
-    input                               a_en_write,     // Don't use at first, rely on i_mem.v
-    input [ADDR_SIZE - 1 : 0]           a_addr,
-    output reg [WORD_SIZE - 1 : 0]      a_dout,
+    // input                               a_en_write,     // Don't use at first, rely on i_mem.v
+    // input [ADDR_SIZE - 1 : 0]           a_addr,
+    // output reg [WORD_SIZE - 1 : 0]      a_dout,
     
     // Data port (Port B)
     input                               b_en_write,     // Keep names to change to true dual port one day
@@ -49,7 +49,7 @@ module d_mem #(
     reg [WORD_SIZE - 1 : 0] memory [0 : NUM_WORDS - 1];
 
     // Calculate dynamically which bits to slice for the index into mem
-    wire [ADDR_SIZE - 1 : $clog2(WORD_SIZE / 8)] a_index = a_addr[ADDR_SIZE - 1 : $clog2(WORD_SIZE / 8)];
+    // wire [ADDR_SIZE - 1 : $clog2(WORD_SIZE / 8)] a_index = a_addr[ADDR_SIZE - 1 : $clog2(WORD_SIZE / 8)];
     wire [ADDR_SIZE - 1 : $clog2(WORD_SIZE / 8)] b_index = b_addr[ADDR_SIZE - 1 : $clog2(WORD_SIZE / 8)];
 
     wire [1:0] b_offset = b_addr[1:0];
