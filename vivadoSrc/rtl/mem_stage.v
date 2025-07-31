@@ -29,14 +29,11 @@ module mem_stage #(
     ADDR_SIZE = $clog2(NUM_WORDS)
 
     )(
-
     input clk,
     input rst,
 
-    input [WORD_SIZE - 1 : 0] result,
+    input [WORD_SIZE - 1 : 0] save_addr,
     input [WORD_SIZE - 1 : 0] save_data,
-
-    input [REG_SEL - 1 : 0] rd,
 
     input mem_read,
     input mem_write,
@@ -54,7 +51,6 @@ module mem_stage #(
     output flush_idex,
     output flush_exmem,
     output flush_memwb
-
     );
 
     assign pc_src = ((branch && zero ) || jump) ? 1'b1 : 1'b0;
@@ -77,6 +73,7 @@ module mem_stage #(
         .b_dout(read_data)
     );
 
+    
     branch_unit branch_unit(
 
     );

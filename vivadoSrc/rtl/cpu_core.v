@@ -59,6 +59,9 @@ module cpu_core #(
 
 
     // control signals
+    // termiantes in if
+    wire pc_src;
+
     // terminate in ex
     wire alu_src_id, alu_src_ex;
     wire [3:0] alu_op_id, alu_op_ex;
@@ -76,7 +79,6 @@ module cpu_core #(
     // termiante in wb
     wire mem_to_reg_id, mem_to_reg_ex, mem_to_reg_mem,  mem_to_reg_wb;
     wire reg_write_id, reg_write_ex, reg_write_mem, reg_write_wb;
-
 
 
     // Pipeline registers and stages
@@ -123,11 +125,11 @@ module cpu_core #(
         .rst(rst),
 
         .instr(instr_id),
-
+        // Reg file
         .reg_write(reg_write_wb),
         .rd_data(write_regfile_data_wb),
         .rd_select(rd_wb),
-
+        // Instr decode outputs
         .immd(immd_id),
         .data1(arg1_regfile_id),
         .data2(arg2_regfile_id),
@@ -135,7 +137,7 @@ module cpu_core #(
         .rd(rd_id),
         .rs1(rs1_id),
         .rs2(rs2_id),
-
+        // Control signals
         .mem_read(mem_read_id),
         .mem_write(mem_write_id),
         .mem_to_reg(mem_to_reg_id),
@@ -143,7 +145,7 @@ module cpu_core #(
         .alu_src(alu_src_id),
         .branch(branch_id),
         .jump(jump_id),
-
+        // Load control signals
         .data_size(data_size_id),
         .data_sign(data_sign_id)
     );
@@ -211,29 +213,27 @@ module cpu_core #(
         .ADDR_SIZE(ADDR_SIZE)
     )execution(
         .pc(pc_ex),
-
+        // Data inputs 1 + selection
         .data1(arg1_regfile_ex),
         .mem_forward1(write_regfile_data_mem),
         .wb_forward1(write_regfile_data_wb),
-
+        .sel_forward1(forward_select1),
+        // Data inputs 2 + selection
         .data2(arg2_regfile_ex),
         .mem_forward2(write_regfile_data_mem),
         .wb_forward2(write_regfile_data_wb),
-
-        .immd(immd_ex),
-
-        .sel_forward1(forward_select1),
         .sel_forward2(forward_select2),
-
-        .alu_op(alu_op_ex),
+        // ALU sourcing and operation
         .alu_src(alu_src_ex),
+        .immd(immd_ex),
+        .alu_op(alu_op_ex),
+        // Control signals and outputs
+        .zero(alu_zero_ex),
         .branch(branch_ex),
         .jump(jump_ex),
-
-        .zero(alu_zero_ex),
-        .brnach_target(branch_target_ex),
+        .branch_target(branch_target_ex),
         .result(alu_result_ex),
-        .write_data()
+        .write_data(write_mem_data_ex)
     );
 
     ex_mem_reg #(
@@ -248,7 +248,7 @@ module cpu_core #(
         .flush(flush_exmem),
         .stall(stall_exmem),
 
-        .branch_target(),
+        .branch_target(branch_target_ex),
         .alu_result(write_regfile_data_ex),
         .rd(rd_ex),
 
@@ -287,14 +287,27 @@ module cpu_core #(
         .ADDR_SIZE(ADDR_SIZE)
     ) memory (
         .clk(clk),
+        .rst(rst),
+        // Data to save to mem
+        .save_addr(write_regfile_data_mem), // change the name of this signal... maybe
+        .save_data(write_mem_data_mem),
 
-        .b_en_read(mem_read_mem),
-        .b_en_write(mem_write_mem),
-        .b_addr(write_regfile_data_mem),
-        .b_din(write_mem_data_mem),
-        .b_size(data_size_mem),
-        .b_unsigned(data_sign_mem),
-        .b_dout()
+        .mem_read(mem_read_mem),
+        .mem_write(mem_write_mem),
+        .branch(branch_mem),
+        .jump(jump_mem),
+        .zero(alu_zero_mem),
+
+        .data_sign(data_sign_mem),
+        .data_size(data_size_mem),
+
+        .read_data(read_mem_data_mem),
+        .pc_src(pc_src),
+
+        .flush_ifid(flush_ifid),
+        .flush_idex(flush_idex),
+        .flush_exmem(flush_exmem),
+        .flush_memwb(flush_memwb)
     );
 
     mem_wb_reg #(
@@ -316,7 +329,7 @@ module cpu_core #(
         .reg_write(reg_write_mem),
 
         .read_data_out(read_mem_data_wb),
-        .result_out(write_regfile_data_mem),
+        .result_out(write_regfile_data_wb),
         .rd_out(rd_wb),
         .mem_to_reg_out(mem_to_reg_wb),
         .reg_write_out(reg_write_wb)

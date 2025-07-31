@@ -32,6 +32,8 @@ module branch_unit #(
     input jump,
     input zero,
 
+    // Add stall signals outputs?
+
     output flush_ifid,
     output flush_idex,
     output flush_exmem,
@@ -41,9 +43,9 @@ module branch_unit #(
 
     );
 
-    // In the future, this can be much more complicated, but for now, I just need it
-    // to flush the instructions in the pipeline when we resolve that we're jumping/branching
+    // Branch unit flushes/stalls the pipeline when needed due to branching
     always @(*) begin
+        // Replace this with the pc_src?
         if(jump || (branch && zero))  begin
             
         end else begin

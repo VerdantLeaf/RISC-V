@@ -160,14 +160,6 @@
           <Attr Name="UsedIn" Val="simulation"/>
         </FileInfo>
       </File>
-      <File Path="$PPRDIR/../vivadoSrc/rtl/hazard_unit.v">
-        <FileInfo>
-          <Attr Name="AutoDisabled" Val="1"/>
-          <Attr Name="UsedIn" Val="synthesis"/>
-          <Attr Name="UsedIn" Val="implementation"/>
-          <Attr Name="UsedIn" Val="simulation"/>
-        </FileInfo>
-      </File>
       <File Path="$PPRDIR/../vivadoSrc/rtl/i_decoder.v">
         <FileInfo>
           <Attr Name="AutoDisabled" Val="1"/>
@@ -496,6 +488,7 @@
       </Config>
     </FileSet>
     <FileSet Name="mem_stage_sim" Type="SimulationSrcs" RelSrcDir="$PSRCDIR/mem_stage_sim" RelGenDir="$PGENDIR/mem_stage_sim">
+      <Filter Type="Srcs"/>
       <File Path="$PPRDIR/../vivadoSrc/tb/d_mem_tb.v">
         <FileInfo>
           <Attr Name="AutoDisabled" Val="1"/>
