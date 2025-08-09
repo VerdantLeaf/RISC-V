@@ -38,7 +38,7 @@ module cpu_core #(
 
 
     wire [ADDR_SIZE - 1 : 0] branch_target_ex, branch_target_mem;
-    wire [ADDR_SIZE - 1 : 0] pc_if, pc_id, pc_ex;
+    wire [ADDR_SIZE - 1 : 0] pc_if, pc_id, pc_ex, pc_mem, pc_wb;
 
     wire [WORD_SIZE - 1 : 0] instr_if, instr_id;
     wire [WORD_SIZE - 1 : 0] data1_id, data1_ex;
@@ -71,12 +71,12 @@ module cpu_core #(
     wire mem_read_id, mem_read_ex, mem_read_mem;
     wire mem_write_id, mem_write_ex, mem_write_mem;
     wire branch_id, branch_ex, branch_mem;
-    wire jump_id, jump_ex, jump_mem;
     wire [1:0] data_size_id, data_size_ex, data_size_mem;
     wire data_sign_id, data_sign_ex, data_sign_mem;
     wire alu_zero_ex, alu_zero_mem;
 
     // termiante in wb
+    wire jump_id, jump_ex, jump_mem, jump_wb;
     wire mem_to_reg_id, mem_to_reg_ex, mem_to_reg_mem,  mem_to_reg_wb;
     wire reg_write_id, reg_write_ex, reg_write_mem, reg_write_wb;
 
@@ -326,12 +326,14 @@ module cpu_core #(
         .result(write_regfile_data_mem),
         .rd(rd_mem),
         .mem_to_reg(mem_to_reg_mem),
+        .jump(jump_mem)
         .reg_write(reg_write_mem),
 
         .read_data_out(read_mem_data_wb),
         .result_out(write_regfile_data_wb),
         .rd_out(rd_wb),
         .mem_to_reg_out(mem_to_reg_wb),
+        .jump_out()
         .reg_write_out(reg_write_wb)
     );
 

@@ -35,6 +35,8 @@ module ex_mem_reg #(
     input flush,
     input stall,
 
+    input [ADDR_SIZE - 1 : 0] pc,
+
     input [ADDR_SIZE - 1 : 0] branch_target,    // PC of branch target
     input [WORD_SIZE - 1 : 0] alu_result,       // The result of the ALU operation
     input [REG_SEL - 1 : 0] rd,                 // Select register to write to
@@ -51,6 +53,8 @@ module ex_mem_reg #(
     input [1:0] data_size,                  // Tells the size of the data 00->byte, 01->halfword, 10->word
     input data_sign,                        // Says if the data is signed or not
     
+    output reg [ADDR_SIZE - 1 : 0] pc_out,
+
     output reg [ADDR_SIZE - 1 : 0] branch_target_out,    
     output reg [WORD_SIZE - 1 : 0] alu_result_out,       
     output reg [REG_SEL - 1 : 0] rd_out,  
@@ -71,6 +75,7 @@ module ex_mem_reg #(
     
     always @(posedge clk or posedge rst) begin
         if (rst || flush) begin
+            pc_out <= {ADDR_SIZE{1'b0}};
             branch_target_out <= {ADDR_SIZE{1'b0}};
             alu_result_out <= {WORD_SIZE{1'b0}};
             write_data_out <= {WORD_SIZE{1'b0}};
@@ -88,6 +93,7 @@ module ex_mem_reg #(
             data_size_out <= 2'b00;
             
         end else if(!stall) begin
+            pc_out <= pc;
             branch_target_out <= branch_target;
             alu_result_out <= alu_result;
             write_data_out <= write_data;

@@ -65,7 +65,7 @@ module ex_stage #(
     assign result = alu_res;
 
     // Translate immd to bytes and add to pc to get branch target
-    assign branch_target = (branch || jump) ? pc + (immd << 2) : pc;
+    assign branch_target = (branch || jump) ? (pc - 4) + (immd << 2) : (pc - 4);
     // Mux where to pull zero from based on the alu_op
     assign zero = (alu_op == `ALU_OP_SLT || alu_op == `ALU_OP_SLTU) ? alu_res : alu_zero;
 
