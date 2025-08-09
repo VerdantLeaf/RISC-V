@@ -333,7 +333,7 @@ module cpu_core #(
         .result_out(write_regfile_data_wb),
         .rd_out(rd_wb),
         .mem_to_reg_out(mem_to_reg_wb),
-        .jump_out()
+        .jump_out(jump_wb)
         .reg_write_out(reg_write_wb)
     );
 
@@ -344,6 +344,7 @@ module cpu_core #(
         .alu_data(write_regfile_data_wb),
 
         .mem_to_reg(mem_to_reg_wb),
+        .jump(jump_wb),
         .write_data(write_regfile_data_wb)
     );
 

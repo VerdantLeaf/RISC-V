@@ -1,6 +1,6 @@
 # Status:
 
-EX stage has been completed and testbenched. The data memory design has been completed for a while, but now needs to be testbenched and integrated into the larger MEM stage. 3/5 stages are now complete and verified. Closer to systems level integration and verification. 
+Heading out of town, and shutting down current progress on this project and the assembler for now. Both are in decent spots, but wish they were further along (Summer not going as planned didn't help). Commits may be sparse, working on it...
 
 # RISC-V
 RISC-V implementation. Design and implementation of a 5-stage pipelines RV32I RISC-V processor in Verilog with a Harvard memory architecture. Utilizing the pipeline means developing each stage as well as units to handle the forwarding and branching. 
@@ -18,13 +18,12 @@ For simulation, programs can be ran/added by generating the .mem file and then m
 ## Current things to work on:
 - Reformat control signals into control bus to make easier
 - Complete MEM stage verification
+- Verify top level design(?)
 
+## Completed things:
 
-## Current status:
-
-- EX stage design completed and testbenched
-- IF and ID stages, as well as all submodules, are completed and testbenched
-- CPU defaults to 4KB of instruction memory
+- IF, ID, & EX stage design + TB
+- Instruction + data memory
 - Data memory utilizes a 1R/1RW port setup to enable standard data memory for now, but Von Neumann memory in the future
 - Parameterization of variable length vectors is mostly instantiated
 
